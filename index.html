@@ -454,11 +454,11 @@
 
     <!-- API Key -->
     <div class="api-section">
-      <label>Anthropic API key</label>
+      <label>Gemini API key</label>
       <div class="api-row">
-        <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off">
+        <input type="password" id="apiKey" placeholder="AIza..." autocomplete="off">
       </div>
-      <p class="api-hint">Your key is used only in this browser session and never stored. Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+      <p class="api-hint">Your key is used only in this browser session and never stored. Get one at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></p>
     </div>
 
     <!-- Upload -->
@@ -629,7 +629,7 @@
 
     async function runGenerate() {
       const apiKey = apiKeyInput.value.trim();
-      if (!apiKey) { showError('Please enter your Anthropic API key above.'); return; }
+      if (!apiKey) { showError('Please enter your Gemini API key above.'); return; }
       if (repo.length === 0) { showError('No images in repository. Add some URLs below.'); return; }
 
       errorMsg.style.display = 'none';
@@ -672,35 +672,34 @@
     }
 
     async function analyseHook(url, apiKey) {
+      const SYSTEM_PROMPT = "You are a creative director at a video production company that makes short-form social media content. You will be shown a concept deck image. The deck follows a consistent layout: a series of 9:16 vertical frames shown side by side, with a pink text box above each frame. The FIRST (leftmost) frame and its pink text box above it is the OPENING HOOK of the video. Analyse only the opening hook — the first frame and its headline — and describe the hook concept concisely in 2-3 sentences. Explain: (1) what the visual or narrative device is, (2) what makes it attention-grabbing, (3) what kind of product or brand it might suit. Be specific and creative-director-level insightful. Do not describe the whole deck — only the opening hook.";
+
       try {
-        const res = await fetch("https://api.anthropic.com/v1/messages", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": apiKey,
-            "anthropic-version": "2023-06-01",
-            "anthropic-dangerous-direct-browser-access": "true"
-          },
-          body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: 1000,
-            system: "You are a creative director at a video production company that makes short-form social media content. You will be shown a concept deck image. The deck follows a consistent layout: a series of 9:16 vertical frames shown side by side, with a pink text box above each frame. The FIRST (leftmost) frame and its pink text box above it is the OPENING HOOK of the video. Analyse only the opening hook — the first frame and its headline — and describe the hook concept concisely in 2-3 sentences. Explain: (1) what the visual or narrative device is, (2) what makes it attention-grabbing, (3) what kind of product or brand it might suit. Be specific and creative-director-level insightful. Do not describe the whole deck — only the opening hook.",
-            messages: [
-              {
-                role: "user",
-                content: [
-                  { type: "image", source: { type: "url", url } },
-                  { type: "text", text: "Analyse the opening hook of this concept deck (first frame + its headline text above). Describe the hook concept in 2-3 sentences." }
-                ]
-              }
-            ]
-          })
-        });
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+              contents: [
+                {
+                  role: "user",
+                  parts: [
+                    { image_url: { url } },
+                    { text: "Analyse the opening hook of this concept deck (first frame + its headline text above). Describe the hook concept in 2-3 sentences." }
+                  ]
+                }
+              ],
+              generationConfig: { maxOutputTokens: 1000 }
+            })
+          }
+        );
 
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
-          if (res.status === 401) {
-            analysisText.textContent = 'Invalid API key. Please check and try again.';
+          if (res.status === 400 || res.status === 401 || res.status === 403) {
+            analysisText.textContent = 'Invalid API key or access denied. Please check and try again.';
           } else {
             analysisText.textContent = `API error (${res.status}): ${err?.error?.message || 'Unknown error'}`;
           }
@@ -708,7 +707,7 @@
         }
 
         const data = await res.json();
-        const text = data.content?.find(b => b.type === 'text')?.text || 'No analysis returned.';
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No analysis returned.';
         analysisText.textContent = text;
       } catch (err) {
         analysisText.textContent = 'Could not reach the API. Check your connection and try again.';
