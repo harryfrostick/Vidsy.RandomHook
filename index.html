@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hook Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f7f6f3;
+      --bg-tertiary: #f0ede8;
+      --text-primary: #1a1a18;
+      --text-secondary: #5f5e5a;
+      --text-tertiary: #888780;
+      --border: rgba(0,0,0,0.12);
+      --border-mid: rgba(0,0,0,0.2);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --accent: #E8637A;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a;
+        --bg-secondary: #242422;
+        --bg-tertiary: #2c2c2a;
+        --text-primary: #f0ede8;
+        --text-secondary: #b4b2a9;
+        --text-tertiary: #888780;
+        --border: rgba(255,255,255,0.1);
+        --border-mid: rgba(255,255,255,0.18);
+      }
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--bg-tertiary);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      color: var(--text-primary);
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 2.5rem;
+    }
+
+    .header h1 {
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+    }
+
+    .header p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    /* API Key input */
+    .api-section {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .api-section label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 8px;
+    }
+
+    .api-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .api-row input {
+      flex: 1;
+      padding: 9px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .api-row input:focus {
+      border-color: var(--border-mid);
+    }
+
+    .api-hint {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 6px;
+    }
+
+    .api-hint a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Upload */
+    .upload-zone {
+      border: 1.5px dashed var(--border-mid);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: var(--bg);
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--text-tertiary);
+    }
+
+    .upload-zone.has-file {
+      border-style: solid;
+      border-color: var(--border);
+      padding: 1rem 1.5rem;
+    }
+
+    .upload-zone input[type=file] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+
+    .upload-icon {
+      width: 32px; height: 32px;
+      margin: 0 auto 10px;
+      color: var(--text-tertiary);
+      display: block;
+    }
+
+    .upload-zone p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .upload-zone span {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      display: block;
+      margin-top: 4px;
+    }
+
+    .upload-zone.has-file .upload-icon { display: none; }
+    .upload-zone.has-file span { display: none; }
+
+    /* Buttons */
+    .generate-btn {
+      width: 100%;
+      padding: 14px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      border: 0.5px solid var(--border-mid);
+      border-radius: var(--radius-lg);
+      background: var(--bg);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 0.5rem;
+    }
+
+    .generate-btn:hover:not(:disabled) { background: var(--bg-secondary); }
+    .generate-btn:active:not(:disabled) { transform: scale(0.99); }
+    .generate-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .error-msg {
+      font-size: 13px;
+      color: #c0392b;
+      text-align: center;
+      display: none;
+      margin-top: 6px;
+    }
+
+    /* Results */
+    .results {
+      margin-top: 2rem;
+      display: none;
+    }
+
+    .results.visible { display: block; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 600px) {
+      .results-grid { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .panel-label {
+      padding: 9px 14px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .panel-img-wrap {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel img {
+      width: 100%;
+      display: block;
+    }
+
+    .hook-frame {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      width: 22%;
+      outline: 2.5px solid var(--accent);
+      outline-offset: -2px;
+      pointer-events: none;
+    }
+
+    .hook-frame-label {
+      position: absolute;
+      top: 8px; left: 8px;
+      background: var(--accent);
+      color: white;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    /* Analysis */
+    .analysis-card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .analysis-card .card-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .analysis-text {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text-primary);
+    }
+
+    /* Loading dots */
+    .loading-dots {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .loading-dots span {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+      animation: dot-bounce 1.2s ease-in-out infinite;
+    }
+
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot-bounce {
+      0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Again row */
+    .again-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .again-btn {
+      flex: 1;
+      padding: 11px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      border: 0.5px solid var(--border-mid);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .again-btn:hover:not(:disabled) { background: var(--bg-secondary); }
+    .again-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .counter {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* Repo management */
+    .repo-section {
+      margin-top: 3rem;
+      border-top: 0.5px solid var(--border);
+      padding-top: 2rem;
+    }
+
+    .repo-section h2 {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .repo-section p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .repo-add-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .repo-add-row input {
+      flex: 1;
+      padding: 9px 12px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 13px;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .repo-add-row input:focus { border-color: var(--border-mid); }
+
+    .repo-add-btn {
+      padding: 9px 16px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      border: 0.5px solid var(--border-mid);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      color: var(--text-primary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .repo-add-btn:hover { background: var(--bg-secondary); }
+
+    .repo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .repo-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+    }
+
+    .repo-item span {
+      flex: 1;
+      color: var(--text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .repo-item button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      font-size: 14px;
+      padding: 0 2px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .repo-item button:hover { color: var(--accent); }
+
+    .repo-count {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="header">
+      <h1>Hook generator</h1>
+      <p>Upload your concept deck, generate opening hook inspiration from your catalogue.</p>
+    </div>
+
+    <!-- API Key -->
+    <div class="api-section">
+      <label>Anthropic API key</label>
+      <div class="api-row">
+        <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off">
+      </div>
+      <p class="api-hint">Your key is used only in this browser session and never stored. Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+    </div>
+
+    <!-- Upload -->
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" accept="image/*" id="fileInput">
+      <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M4 16l4-4 4 4M12 12l4-4 4 4M12 12v9"/>
+        <path d="M20 16.7A5 5 0 0016 8h-1.26A8 8 0 104 15.3"/>
+      </svg>
+      <p id="uploadLabel">Drop your concept deck here, or click to browse</p>
+      <span>PNG, JPG, WEBP accepted</span>
+    </div>
+
+    <button class="generate-btn" id="generateBtn" disabled>Generate hook inspiration</button>
+    <p class="error-msg" id="errorMsg"></p>
+
+    <!-- Results -->
+    <div class="results" id="results">
+      <div class="results-grid">
+        <div class="panel">
+          <div class="panel-label">Your deck</div>
+          <div class="panel-img-wrap">
+            <img id="baseImg" src="" alt="Your uploaded concept deck">
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-label">Hook inspiration — <span id="hookIndex">—</span></div>
+          <div class="panel-img-wrap">
+            <img id="hookImg" src="" alt="Inspiration from catalogue" crossorigin="anonymous">
+            <div class="hook-frame"><div class="hook-frame-label">opening hook</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analysis-card">
+        <div class="card-title">Hook concept</div>
+        <div class="analysis-text" id="analysisText">
+          <div class="loading-dots"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+
+      <div class="again-row">
+        <button class="again-btn" id="againBtn">Try another hook</button>
+      </div>
+      <p class="counter" id="counter"></p>
+    </div>
+
+    <!-- Repo management -->
+    <div class="repo-section">
+      <h2>Manage repository</h2>
+      <p>Add or remove ImageShack URLs from your inspiration catalogue. Changes persist in this browser session.</p>
+      <div class="repo-add-row">
+        <input type="url" id="newUrl" placeholder="https://imagizer.imageshack.com/...">
+        <button class="repo-add-btn" id="addUrlBtn">Add URL</button>
+      </div>
+      <div class="repo-list" id="repoList"></div>
+      <p class="repo-count" id="repoCount"></p>
+    </div>
+
+  </div>
+
+  <script>
+    const DEFAULT_REPO = [
+      "https://imagizer.imageshack.com/img922/3343/TJX9vB.png",
+      "https://imagizer.imageshack.com/img921/5669/zWO49p.png",
+      "https://imagizer.imageshack.com/img921/7113/6ADXka.png",
+      "https://imagizer.imageshack.com/img921/9808/wnQy9T.png",
+      "https://imagizer.imageshack.com/img921/2849/Pymc1h.png",
+      "https://imagizer.imageshack.com/img924/3917/OMusg0.png",
+      "https://imagizer.imageshack.com/img924/9602/Gc9lrf.png",
+      "https://imagizer.imageshack.com/img924/1426/S2t86d.png",
+      "https://imagizer.imageshack.com/img924/7683/7JEGAO.png",
+      "https://imagizer.imageshack.com/img923/290/c1Go96.png",
+      "https://imagizer.imageshack.com/img921/4473/laEiXD.png",
+      "https://imagizer.imageshack.com/img923/4273/xjYCfB.png",
+      "https://imagizer.imageshack.com/img923/3737/iCtCzo.png",
+      "https://imagizer.imageshack.com/img921/6140/zoEiMR.png",
+      "https://imagizer.imageshack.com/img924/499/j9hGn4.png",
+      "https://imagizer.imageshack.com/img924/7636/t9DrLz.png",
+      "https://imagizer.imageshack.com/img922/171/lYkGjh.png",
+      "https://imagizer.imageshack.com/img923/7509/OTxEuw.png",
+      "https://imagizer.imageshack.com/img922/456/zswSHL.png",
+      "https://imagizer.imageshack.com/img922/3618/uybXcP.png",
+      "https://imagizer.imageshack.com/img923/7342/teqQXe.png"
+    ];
+
+    let repo = [...DEFAULT_REPO];
+    let uploadedBase64 = null;
+    let lastIndex = -1;
+    let useCount = 0;
+
+    const fileInput = document.getElementById('fileInput');
+    const uploadZone = document.getElementById('uploadZone');
+    const uploadLabel = document.getElementById('uploadLabel');
+    const generateBtn = document.getElementById('generateBtn');
+    const results = document.getElementById('results');
+    const baseImg = document.getElementById('baseImg');
+    const hookImg = document.getElementById('hookImg');
+    const hookIndex = document.getElementById('hookIndex');
+    const analysisText = document.getElementById('analysisText');
+    const againBtn = document.getElementById('againBtn');
+    const counter = document.getElementById('counter');
+    const errorMsg = document.getElementById('errorMsg');
+    const apiKeyInput = document.getElementById('apiKey');
+    const newUrlInput = document.getElementById('newUrl');
+    const addUrlBtn = document.getElementById('addUrlBtn');
+    const repoList = document.getElementById('repoList');
+    const repoCount = document.getElementById('repoCount');
+
+    function renderRepo() {
+      repoList.innerHTML = '';
+      repo.forEach((url, i) => {
+        const item = document.createElement('div');
+        item.className = 'repo-item';
+        item.innerHTML = `<span title="${url}">${url}</span><button onclick="removeUrl(${i})" title="Remove">×</button>`;
+        repoList.appendChild(item);
+      });
+      repoCount.textContent = `${repo.length} image${repo.length === 1 ? '' : 's'} in catalogue`;
+    }
+
+    function removeUrl(i) {
+      repo.splice(i, 1);
+      renderRepo();
+    }
+
+    addUrlBtn.addEventListener('click', () => {
+      const val = newUrlInput.value.trim();
+      if (!val.startsWith('http')) return;
+      repo.push(val);
+      newUrlInput.value = '';
+      renderRepo();
+    });
+
+    newUrlInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') addUrlBtn.click();
+    });
+
+    fileInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        uploadedBase64 = ev.target.result;
+        baseImg.src = uploadedBase64;
+        uploadZone.classList.add('has-file');
+        uploadLabel.textContent = file.name;
+        generateBtn.disabled = false;
+        errorMsg.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    generateBtn.addEventListener('click', () => runGenerate());
+    againBtn.addEventListener('click', () => runGenerate());
+
+    function pickRandom() {
+      if (repo.length === 0) return null;
+      let idx;
+      do { idx = Math.floor(Math.random() * repo.length); } while (idx === lastIndex && repo.length > 1);
+      lastIndex = idx;
+      return { url: repo[idx], idx };
+    }
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.style.display = 'block';
+    }
+
+    async function runGenerate() {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) { showError('Please enter your Anthropic API key above.'); return; }
+      if (repo.length === 0) { showError('No images in repository. Add some URLs below.'); return; }
+
+      errorMsg.style.display = 'none';
+      generateBtn.disabled = true;
+      againBtn.disabled = true;
+      generateBtn.textContent = 'Generating…';
+
+      results.classList.add('visible');
+      analysisText.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+      hookImg.style.opacity = '0.3';
+
+      const pick = pickRandom();
+      if (!pick) return;
+      const { url, idx } = pick;
+      hookIndex.textContent = `${idx + 1} of ${repo.length}`;
+
+      const loaded = await new Promise(resolve => {
+        hookImg.onload = () => resolve(true);
+        hookImg.onerror = () => resolve(false);
+        hookImg.src = url;
+      });
+
+      if (!loaded) {
+        showError('Could not load that image. Try again or remove it from the repository.');
+        generateBtn.disabled = false;
+        againBtn.disabled = false;
+        generateBtn.textContent = 'Generate hook inspiration';
+        return;
+      }
+
+      hookImg.style.opacity = '1';
+      useCount++;
+      counter.textContent = `${useCount} hook${useCount === 1 ? '' : 's'} generated this session`;
+
+      await analyseHook(url, apiKey);
+
+      generateBtn.disabled = false;
+      againBtn.disabled = false;
+      generateBtn.textContent = 'Generate hook inspiration';
+    }
+
+    async function analyseHook(url, apiKey) {
+      try {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": apiKey,
+            "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true"
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 1000,
+            system: "You are a creative director at a video production company that makes short-form social media content. You will be shown a concept deck image. The deck follows a consistent layout: a series of 9:16 vertical frames shown side by side, with a pink text box above each frame. The FIRST (leftmost) frame and its pink text box above it is the OPENING HOOK of the video. Analyse only the opening hook — the first frame and its headline — and describe the hook concept concisely in 2-3 sentences. Explain: (1) what the visual or narrative device is, (2) what makes it attention-grabbing, (3) what kind of product or brand it might suit. Be specific and creative-director-level insightful. Do not describe the whole deck — only the opening hook.",
+            messages: [
+              {
+                role: "user",
+                content: [
+                  { type: "image", source: { type: "url", url } },
+                  { type: "text", text: "Analyse the opening hook of this concept deck (first frame + its headline text above). Describe the hook concept in 2-3 sentences." }
+                ]
+              }
+            ]
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          if (res.status === 401) {
+            analysisText.textContent = 'Invalid API key. Please check and try again.';
+          } else {
+            analysisText.textContent = `API error (${res.status}): ${err?.error?.message || 'Unknown error'}`;
+          }
+          return;
+        }
+
+        const data = await res.json();
+        const text = data.content?.find(b => b.type === 'text')?.text || 'No analysis returned.';
+        analysisText.textContent = text;
+      } catch (err) {
+        analysisText.textContent = 'Could not reach the API. Check your connection and try again.';
+      }
+    }
+
+    renderRepo();
+  </script>
+</body>
+</html>
