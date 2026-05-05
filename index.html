@@ -189,6 +189,49 @@
 
     .counter { font-size: 12px; color: var(--text-tertiary); text-align: center; margin-top: 10px; }
 
+    /* Merge */
+    .merge-row {
+      display: flex; gap: 10px; margin-top: 1rem; align-items: center;
+    }
+    .merge-btn {
+      flex: 1; padding: 13px; font-family: inherit; font-size: 14px; font-weight: 500;
+      border: 0.5px solid var(--accent); border-radius: var(--radius-md);
+      background: var(--accent); color: white; cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .merge-btn:hover:not(:disabled) { opacity: 0.88; }
+    .merge-btn:active:not(:disabled) { transform: scale(0.99); }
+    .merge-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .download-btn {
+      padding: 13px 18px; font-family: inherit; font-size: 14px; font-weight: 500;
+      border: 0.5px solid var(--border-mid); border-radius: var(--radius-md);
+      background: var(--bg); color: var(--text-primary); cursor: pointer;
+      text-decoration: none; display: none; transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .download-btn.visible { display: inline-flex; align-items: center; gap: 6px; }
+    .download-btn:hover { background: var(--bg-secondary); }
+
+    .base-panel-label-wrap {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 14px;
+      border-bottom: 0.5px solid var(--border); background: var(--bg-secondary);
+    }
+    .base-panel-label-wrap .panel-label-text {
+      font-size: 11px; font-weight: 500; color: var(--text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .merged-badge {
+      font-size: 10px; font-weight: 500; padding: 2px 8px;
+      border-radius: 4px; background: #fde8ec; color: #c0344f;
+      display: none;
+    }
+    .merged-badge.visible { display: inline-block; }
+    @media (prefers-color-scheme: dark) {
+      .merged-badge { background: #3a1520; color: #f08098; }
+    }
+
     /* Repo section */
     .repo-section { margin-top: 3rem; border-top: 0.5px solid var(--border); padding-top: 2rem; }
     .repo-section h2 { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
@@ -275,10 +318,14 @@
     <div class="results" id="results">
       <div id="matchBadgeWrap"></div>
       <div class="results-grid">
-        <div class="panel">
-          <div class="panel-label">Your deck</div>
+        <div class="panel" id="basePanel">
+          <div class="base-panel-label-wrap">
+            <span class="panel-label-text">Your deck</span>
+            <span class="merged-badge" id="mergedBadge">Merged</span>
+          </div>
           <div class="panel-img-wrap">
             <img id="baseImg" src="" alt="Your uploaded concept deck">
+            <canvas id="mergeCanvas" style="width:100%;display:none;"></canvas>
           </div>
         </div>
         <div class="panel">
@@ -299,6 +346,13 @@
 
       <div class="again-row">
         <button class="again-btn" id="againBtn">Try another hook</button>
+      </div>
+      <div class="merge-row" id="mergeRow" style="display:none;">
+        <button class="merge-btn" id="mergeBtn">Merge hook into deck</button>
+        <a class="download-btn" id="downloadBtn" download="merged-deck.png">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download
+        </a>
       </div>
       <p class="counter" id="counter"></p>
     </div>
@@ -666,6 +720,7 @@ Return only the raw JSON object, no markdown, no explanation.`;
       }
 
       cropToCanvas(hookImg, hookCanvas);
+      showMergeRow();
       useCount++;
       counter.textContent = `${useCount} hook${useCount === 1 ? '' : 's'} generated this session`;
 
@@ -698,6 +753,115 @@ Be specific and creative-director-level insightful. Do not describe the whole de
           analysisText.textContent = `Could not analyse: ${err.message}`;
         }
       }
+    }
+
+    // ── Merge ─────────────────────────────────────────────────────────────────
+
+    const mergeRow      = document.getElementById('mergeRow');
+    const mergeBtn      = document.getElementById('mergeBtn');
+    const downloadBtn   = document.getElementById('downloadBtn');
+    const mergeCanvas   = document.getElementById('mergeCanvas');
+    const mergedBadge   = document.getElementById('mergedBadge');
+
+    // Show merge button once a hook has been generated
+    function showMergeRow() {
+      mergeRow.style.display = 'flex';
+      downloadBtn.classList.remove('visible');
+      mergeBtn.textContent = 'Merge hook into deck';
+      mergeBtn.disabled = false;
+      mergedBadge.classList.remove('visible');
+      // Reset base panel back to original img if re-generating
+      baseImg.style.display = 'block';
+      mergeCanvas.style.display = 'none';
+    }
+
+    mergeBtn.addEventListener('click', doMerge);
+
+    function detectPinkBarHeight(img) {
+      // Draw full image to a temp canvas, scan down left-centre column
+      // to find where pink stops
+      const tmp = document.createElement('canvas');
+      tmp.width  = img.naturalWidth;
+      tmp.height = img.naturalHeight;
+      const ctx = tmp.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const scanX = Math.floor(img.naturalWidth * 0.11); // middle of first frame
+      const data  = ctx.getImageData(scanX, 0, 1, img.naturalHeight).data;
+
+      // Pink: R high (>200), G middling (120-220), B middling (140-230), relatively high R vs B
+      function isPink(r, g, b) {
+        return r > 200 && g > 120 && g < 230 && b > 130 && b < 240 && r > b && r > g;
+      }
+
+      let lastPinkRow = 0;
+      for (let y = 0; y < img.naturalHeight; y++) {
+        const i = y * 4;
+        if (isPink(data[i], data[i+1], data[i+2])) lastPinkRow = y;
+        else if (lastPinkRow > 10 && y > lastPinkRow + 5) break; // pink ended
+      }
+      return lastPinkRow + 1; // height of pink bar in px
+    }
+
+    function doMerge() {
+      if (!uploadedBase64 || !hookImg.src || hookImg.naturalWidth === 0) return;
+
+      mergeBtn.disabled = true;
+      mergeBtn.textContent = 'Merging…';
+
+      // Load base image fresh to avoid taint issues
+      const base = new Image();
+      base.crossOrigin = 'anonymous';
+      base.onload = () => {
+        const W = base.naturalWidth;
+        const H = base.naturalHeight;
+        const hookW = Math.floor(W * 0.22); // first frame width
+
+        // Detect pink bar height on both images
+        const basePinkH = detectPinkBarHeight(base);
+        const hookPinkH = detectPinkBarHeight(hookImg);
+
+        // Set up output canvas
+        mergeCanvas.width  = W;
+        mergeCanvas.height = H;
+        const ctx = mergeCanvas.getContext('2d');
+
+        // Step 1: draw full base deck
+        ctx.drawImage(base, 0, 0);
+
+        // Step 2: overwrite first-frame pink caption with inspiration caption
+        // Source: hookImg, x=0, y=0, w=hookW (22%), h=hookPinkH
+        // Dest:   mergeCanvas, x=0, y=0, w=hookW, h=basePinkH (scale to fit)
+        ctx.drawImage(hookImg,
+          0, 0, Math.floor(hookImg.naturalWidth * 0.22), hookPinkH,   // src
+          0, 0, hookW, basePinkH                                        // dst
+        );
+
+        // Step 3: overwrite first-frame image content with inspiration frame
+        // Source: hookImg below pink bar
+        const hookFrameH = hookImg.naturalHeight - hookPinkH;
+        const baseFrameH = H - basePinkH;
+        ctx.drawImage(hookImg,
+          0, hookPinkH, Math.floor(hookImg.naturalWidth * 0.22), hookFrameH,  // src
+          0, basePinkH, hookW, baseFrameH                                       // dst
+        );
+
+        // Show merged canvas, hide original img
+        baseImg.style.display = 'none';
+        mergeCanvas.style.display = 'block';
+        mergedBadge.classList.add('visible');
+
+        // Set download link
+        downloadBtn.href = mergeCanvas.toDataURL('image/png');
+        downloadBtn.classList.add('visible');
+
+        mergeBtn.textContent = 'Merge hook into deck';
+        mergeBtn.disabled = false;
+      };
+      base.onerror = () => {
+        mergeBtn.textContent = 'Merge failed — try again';
+        mergeBtn.disabled = false;
+      };
+      base.src = uploadedBase64;
     }
 
     // ── Init ───────────────────────────────────────────────────────────────
