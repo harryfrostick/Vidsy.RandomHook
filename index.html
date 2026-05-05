@@ -49,26 +49,11 @@
       padding: 3rem 1.5rem 4rem;
     }
 
-    /* Header */
-    .header {
-      margin-bottom: 2.5rem;
-    }
+    .header { margin-bottom: 2.5rem; }
+    .header h1 { font-size: 26px; font-weight: 500; letter-spacing: -0.03em; }
+    .header p { font-size: 15px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; }
 
-    .header h1 {
-      font-size: 26px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-    }
-
-    .header p {
-      font-size: 15px;
-      color: var(--text-secondary);
-      margin-top: 6px;
-      line-height: 1.5;
-    }
-
-    /* API Key input */
+    /* API Key */
     .api-section {
       background: var(--bg);
       border: 0.5px solid var(--border);
@@ -76,372 +61,186 @@
       padding: 1.25rem 1.5rem;
       margin-bottom: 1.25rem;
     }
-
     .api-section label {
-      display: block;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      margin-bottom: 8px;
+      display: block; font-size: 12px; font-weight: 500; color: var(--text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px;
     }
-
-    .api-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
+    .api-row { display: flex; gap: 8px; align-items: center; }
     .api-row input {
-      flex: 1;
-      padding: 9px 12px;
-      font-family: inherit;
-      font-size: 14px;
-      background: var(--bg-secondary);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-      outline: none;
+      flex: 1; padding: 9px 12px; font-family: inherit; font-size: 14px;
+      background: var(--bg-secondary); border: 0.5px solid var(--border);
+      border-radius: var(--radius-md); color: var(--text-primary); outline: none;
     }
-
-    .api-row input:focus {
-      border-color: var(--border-mid);
-    }
-
-    .api-hint {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      margin-top: 6px;
-    }
-
-    .api-hint a {
-      color: var(--accent);
-      text-decoration: none;
-    }
+    .api-row input:focus { border-color: var(--border-mid); }
+    .api-hint { font-size: 12px; color: var(--text-tertiary); margin-top: 6px; }
+    .api-hint a { color: var(--accent); text-decoration: none; }
 
     /* Upload */
     .upload-zone {
-      border: 1.5px dashed var(--border-mid);
-      border-radius: var(--radius-lg);
-      padding: 2.5rem 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      background: var(--bg);
-      position: relative;
-      margin-bottom: 1rem;
+      border: 1.5px dashed var(--border-mid); border-radius: var(--radius-lg);
+      padding: 2.5rem 1.5rem; text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s; background: var(--bg);
+      position: relative; margin-bottom: 1rem;
     }
-
-    .upload-zone:hover {
-      border-color: var(--text-tertiary);
-    }
-
-    .upload-zone.has-file {
-      border-style: solid;
-      border-color: var(--border);
-      padding: 1rem 1.5rem;
-    }
-
-    .upload-zone input[type=file] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
-
-    .upload-icon {
-      width: 32px; height: 32px;
-      margin: 0 auto 10px;
-      color: var(--text-tertiary);
-      display: block;
-    }
-
-    .upload-zone p {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    .upload-zone span {
-      font-size: 13px;
-      color: var(--text-tertiary);
-      display: block;
-      margin-top: 4px;
-    }
-
+    .upload-zone:hover { border-color: var(--text-tertiary); }
+    .upload-zone.has-file { border-style: solid; border-color: var(--border); padding: 1rem 1.5rem; }
+    .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-icon { width: 32px; height: 32px; margin: 0 auto 10px; color: var(--text-tertiary); display: block; }
+    .upload-zone p { font-size: 14px; color: var(--text-secondary); }
+    .upload-zone span { font-size: 13px; color: var(--text-tertiary); display: block; margin-top: 4px; }
     .upload-zone.has-file .upload-icon { display: none; }
     .upload-zone.has-file span { display: none; }
 
     /* Buttons */
     .generate-btn {
-      width: 100%;
-      padding: 14px;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 500;
-      border: 0.5px solid var(--border-mid);
-      border-radius: var(--radius-lg);
-      background: var(--bg);
-      color: var(--text-primary);
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-      margin-bottom: 0.5rem;
+      width: 100%; padding: 14px; font-family: inherit; font-size: 15px; font-weight: 500;
+      border: 0.5px solid var(--border-mid); border-radius: var(--radius-lg);
+      background: var(--bg); color: var(--text-primary); cursor: pointer;
+      transition: background 0.15s, transform 0.1s; margin-bottom: 0.5rem;
     }
-
     .generate-btn:hover:not(:disabled) { background: var(--bg-secondary); }
     .generate-btn:active:not(:disabled) { transform: scale(0.99); }
     .generate-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-    .error-msg {
-      font-size: 13px;
-      color: #c0392b;
-      text-align: center;
-      display: none;
-      margin-top: 6px;
+    .error-msg { font-size: 13px; color: #c0392b; text-align: center; display: none; margin-top: 6px; }
+
+    /* Match badge */
+    .match-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 500; padding: 4px 10px;
+      border-radius: 20px; margin-bottom: 1.25rem;
     }
+    .match-badge.matched { background: #edf7ed; color: #2d7a2d; }
+    .match-badge.fallback { background: #fef6e4; color: #8a6200; }
+    @media (prefers-color-scheme: dark) {
+      .match-badge.matched { background: #1a3a1a; color: #7ecf7e; }
+      .match-badge.fallback { background: #3a2e00; color: #f0c040; }
+    }
+    .match-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .match-badge.matched .match-dot { background: #2d7a2d; }
+    .match-badge.fallback .match-dot { background: #c08000; }
 
     /* Results */
-    .results {
-      margin-top: 2rem;
-      display: none;
-    }
-
+    .results { margin-top: 2rem; display: none; }
     .results.visible { display: block; }
 
     .results-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
-      margin-bottom: 1.25rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.25rem; margin-bottom: 1.25rem;
     }
+    @media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
 
-    @media (max-width: 600px) {
-      .results-grid { grid-template-columns: 1fr; }
-    }
-
-    .panel {
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
-
+    .panel { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
     .panel-label {
-      padding: 9px 14px;
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      border-bottom: 0.5px solid var(--border);
-      background: var(--bg-secondary);
+      padding: 9px 14px; font-size: 11px; font-weight: 500; color: var(--text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      border-bottom: 0.5px solid var(--border); background: var(--bg-secondary);
     }
+    .panel-img-wrap { position: relative; overflow: hidden; }
+    .panel img { width: 100%; display: block; }
 
-    .panel-img-wrap {
-      position: relative;
-      overflow: hidden;
+    /* Tags row inside panel label */
+    .tag {
+      display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 7px;
+      border-radius: 4px; margin-left: 6px; vertical-align: middle;
+      background: var(--bg-tertiary); color: var(--text-secondary);
+      text-transform: none; letter-spacing: 0;
     }
-
-    .panel img {
-      width: 100%;
-      display: block;
-    }
-
-    .hook-frame {
-      position: absolute;
-      top: 0; left: 0;
-      height: 100%;
-      width: 22%;
-      outline: 2.5px solid var(--accent);
-      outline-offset: -2px;
-      pointer-events: none;
-    }
-
-    .hook-frame-label {
-      position: absolute;
-      top: 8px; left: 8px;
-      background: var(--accent);
-      color: white;
-      font-size: 10px;
-      font-weight: 500;
-      padding: 2px 7px;
-      border-radius: 4px;
-      letter-spacing: 0.04em;
+    .tag.category { background: #fde8ec; color: #c0344f; }
+    .tag.mechanic { background: #e8edfde0; color: #3a4ab0; }
+    @media (prefers-color-scheme: dark) {
+      .tag.category { background: #3a1520; color: #f08098; }
+      .tag.mechanic { background: #1a2040; color: #8898f0; }
     }
 
     /* Analysis */
     .analysis-card {
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem 1.5rem;
-      margin-bottom: 1rem;
+      background: var(--bg); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1rem;
     }
-
     .analysis-card .card-title {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 10px;
+      font-size: 11px; font-weight: 500; color: var(--text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
     }
-
-    .analysis-text {
-      font-size: 14px;
-      line-height: 1.75;
-      color: var(--text-primary);
-    }
+    .analysis-text { font-size: 14px; line-height: 1.75; color: var(--text-primary); }
 
     /* Loading dots */
-    .loading-dots {
-      display: inline-flex;
-      gap: 4px;
-      align-items: center;
-    }
-
+    .loading-dots { display: inline-flex; gap: 4px; align-items: center; }
     .loading-dots span {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--text-tertiary);
+      width: 5px; height: 5px; border-radius: 50%; background: var(--text-tertiary);
       animation: dot-bounce 1.2s ease-in-out infinite;
     }
-
     .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
     @keyframes dot-bounce {
       0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
       40% { transform: scale(1); opacity: 1; }
     }
 
     /* Again row */
-    .again-row {
-      display: flex;
-      gap: 10px;
-    }
-
+    .again-row { display: flex; gap: 10px; }
     .again-btn {
-      flex: 1;
-      padding: 11px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      border: 0.5px solid var(--border-mid);
-      border-radius: var(--radius-md);
-      background: var(--bg);
-      color: var(--text-primary);
-      cursor: pointer;
-      transition: background 0.15s;
+      flex: 1; padding: 11px; font-family: inherit; font-size: 14px; font-weight: 500;
+      border: 0.5px solid var(--border-mid); border-radius: var(--radius-md);
+      background: var(--bg); color: var(--text-primary); cursor: pointer; transition: background 0.15s;
     }
-
     .again-btn:hover:not(:disabled) { background: var(--bg-secondary); }
     .again-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-    .counter {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      text-align: center;
-      margin-top: 10px;
-    }
+    .counter { font-size: 12px; color: var(--text-tertiary); text-align: center; margin-top: 10px; }
 
-    /* Repo management */
-    .repo-section {
-      margin-top: 3rem;
-      border-top: 0.5px solid var(--border);
-      padding-top: 2rem;
-    }
+    /* Repo section */
+    .repo-section { margin-top: 3rem; border-top: 0.5px solid var(--border); padding-top: 2rem; }
+    .repo-section h2 { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+    .repo-section > p { font-size: 13px; color: var(--text-secondary); margin-bottom: 1rem; }
 
-    .repo-section h2 {
-      font-size: 16px;
-      font-weight: 500;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
-
-    .repo-section p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 1rem;
-    }
-
-    .repo-add-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 1rem;
-    }
-
+    .repo-add-row { display: flex; gap: 8px; margin-bottom: 1rem; }
     .repo-add-row input {
-      flex: 1;
-      padding: 9px 12px;
-      font-family: 'DM Sans', system-ui, sans-serif;
-      font-size: 13px;
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-      outline: none;
+      flex: 1; padding: 9px 12px; font-family: inherit; font-size: 13px;
+      background: var(--bg); border: 0.5px solid var(--border);
+      border-radius: var(--radius-md); color: var(--text-primary); outline: none;
     }
-
     .repo-add-row input:focus { border-color: var(--border-mid); }
 
-    .repo-add-btn {
-      padding: 9px 16px;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      border: 0.5px solid var(--border-mid);
-      border-radius: var(--radius-md);
-      background: var(--bg);
-      color: var(--text-primary);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.15s;
+    .repo-btn {
+      padding: 9px 16px; font-family: inherit; font-size: 13px; font-weight: 500;
+      border: 0.5px solid var(--border-mid); border-radius: var(--radius-md);
+      background: var(--bg); color: var(--text-primary); cursor: pointer;
+      white-space: nowrap; transition: background 0.15s;
     }
+    .repo-btn:hover:not(:disabled) { background: var(--bg-secondary); }
+    .repo-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .repo-btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .repo-btn.primary:hover:not(:disabled) { opacity: 0.88; background: var(--accent); }
 
-    .repo-add-btn:hover { background: var(--bg-secondary); }
-
-    .repo-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-height: 220px;
-      overflow-y: auto;
+    .index-row {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px; margin-bottom: 1rem;
+      padding: 1rem 1.25rem; background: var(--bg);
+      border: 0.5px solid var(--border); border-radius: var(--radius-lg);
     }
+    .index-status { font-size: 13px; color: var(--text-secondary); }
+    .index-status strong { color: var(--text-primary); font-weight: 500; }
+    .index-progress {
+      font-size: 12px; color: var(--text-tertiary); margin-top: 3px;
+      display: none;
+    }
+    .index-progress.visible { display: block; }
 
+    .repo-list { display: flex; flex-direction: column; gap: 4px; max-height: 280px; overflow-y: auto; }
     .repo-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      background: var(--bg-secondary);
-      border-radius: var(--radius-md);
-      font-size: 12px;
+      display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+      background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 12px;
     }
-
-    .repo-item span {
-      flex: 1;
-      color: var(--text-secondary);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
+    .repo-item-url { flex: 1; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .repo-item-tags { display: flex; gap: 4px; flex-shrink: 0; }
     .repo-item button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text-tertiary);
-      font-size: 14px;
-      padding: 0 2px;
-      line-height: 1;
-      flex-shrink: 0;
+      background: none; border: none; cursor: pointer; color: var(--text-tertiary);
+      font-size: 14px; padding: 0 2px; line-height: 1; flex-shrink: 0;
     }
-
     .repo-item button:hover { color: var(--accent); }
 
-    .repo-count {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      margin-top: 8px;
-    }
+    .repo-count { font-size: 12px; color: var(--text-tertiary); margin-top: 8px; }
   </style>
 </head>
 <body>
@@ -449,19 +248,17 @@
 
     <div class="header">
       <h1>Hook generator</h1>
-      <p>Upload your concept deck, generate opening hook inspiration from your catalogue.</p>
+      <p>Upload your concept deck, get opening hook inspiration matched to your product category.</p>
     </div>
 
-    <!-- API Key -->
     <div class="api-section">
       <label>Gemini API key</label>
       <div class="api-row">
         <input type="password" id="apiKey" placeholder="AIza..." autocomplete="off">
       </div>
-      <p class="api-hint">Your key is used only in this browser session and never stored. Get one at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></p>
+      <p class="api-hint">Used only in this browser session, never stored. Get one at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></p>
     </div>
 
-    <!-- Upload -->
     <div class="upload-zone" id="uploadZone">
       <input type="file" accept="image/*" id="fileInput">
       <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -475,8 +272,8 @@
     <button class="generate-btn" id="generateBtn" disabled>Generate hook inspiration</button>
     <p class="error-msg" id="errorMsg"></p>
 
-    <!-- Results -->
     <div class="results" id="results">
+      <div id="matchBadgeWrap"></div>
       <div class="results-grid">
         <div class="panel">
           <div class="panel-label">Your deck</div>
@@ -485,10 +282,10 @@
           </div>
         </div>
         <div class="panel">
-          <div class="panel-label">Hook inspiration — <span id="hookIndex">—</span></div>
+          <div class="panel-label" id="hookPanelLabel">Opening hook</div>
           <div class="panel-img-wrap">
-            <img id="hookImg" src="" alt="Inspiration from catalogue" crossorigin="anonymous">
-            <div class="hook-frame"><div class="hook-frame-label">opening hook</div></div>
+            <img id="hookImg" src="" alt="" style="display:none" crossorigin="anonymous">
+            <canvas id="hookCanvas" style="width:100%;display:block;"></canvas>
           </div>
         </div>
       </div>
@@ -506,13 +303,21 @@
       <p class="counter" id="counter"></p>
     </div>
 
-    <!-- Repo management -->
     <div class="repo-section">
       <h2>Manage repository</h2>
-      <p>Add or remove ImageShack URLs from your inspiration catalogue. Changes persist in this browser session.</p>
+      <p>Add concept deck URLs, then index the catalogue so the generator can match by product category.</p>
+
+      <div class="index-row">
+        <div>
+          <div class="index-status" id="indexStatus"><strong>Not indexed</strong> — run indexing before generating</div>
+          <div class="index-progress" id="indexProgress"></div>
+        </div>
+        <button class="repo-btn primary" id="indexBtn">Index catalogue</button>
+      </div>
+
       <div class="repo-add-row">
         <input type="url" id="newUrl" placeholder="https://imagizer.imageshack.com/...">
-        <button class="repo-add-btn" id="addUrlBtn">Add URL</button>
+        <button class="repo-btn" id="addUrlBtn">Add URL</button>
       </div>
       <div class="repo-list" id="repoList"></div>
       <p class="repo-count" id="repoCount"></p>
@@ -521,6 +326,9 @@
   </div>
 
   <script>
+    const CATEGORIES = ['Beauty', 'Food & Drink', 'Fashion', 'Fitness', 'Home', 'Tech', 'Entertainment', 'Lifestyle'];
+    const MECHANICS  = ['Trend-led', 'Product reveal', 'Talking head', 'Transformation', 'Social proof', 'Humour', 'Challenge'];
+
     const DEFAULT_REPO = [
       "https://imagizer.imageshack.com/img922/3343/TJX9vB.png",
       "https://imagizer.imageshack.com/img921/5669/zWO49p.png",
@@ -545,57 +353,114 @@
       "https://imagizer.imageshack.com/img923/7342/teqQXe.png"
     ];
 
+    // catalogue index: { [url]: { category, mechanic } }
+    let catalogueIndex = {};
     let repo = [...DEFAULT_REPO];
     let uploadedBase64 = null;
-    let lastIndex = -1;
+    let detectedCategory = null;
+    let lastUrl = null;
     let useCount = 0;
 
-    const fileInput = document.getElementById('fileInput');
-    const uploadZone = document.getElementById('uploadZone');
-    const uploadLabel = document.getElementById('uploadLabel');
-    const generateBtn = document.getElementById('generateBtn');
-    const results = document.getElementById('results');
-    const baseImg = document.getElementById('baseImg');
-    const hookImg = document.getElementById('hookImg');
-    const hookIndex = document.getElementById('hookIndex');
-    const analysisText = document.getElementById('analysisText');
-    const againBtn = document.getElementById('againBtn');
-    const counter = document.getElementById('counter');
-    const errorMsg = document.getElementById('errorMsg');
-    const apiKeyInput = document.getElementById('apiKey');
-    const newUrlInput = document.getElementById('newUrl');
-    const addUrlBtn = document.getElementById('addUrlBtn');
-    const repoList = document.getElementById('repoList');
-    const repoCount = document.getElementById('repoCount');
+    const STORAGE_KEY = 'hookgen_catalogue_index';
+    const REPO_KEY    = 'hookgen_repo';
 
+    // ── Persist / restore ──────────────────────────────────────────────────
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(catalogueIndex));
+        localStorage.setItem(REPO_KEY, JSON.stringify(repo));
+      } catch(e) {}
+    }
+
+    function restoreState() {
+      try {
+        const idx = localStorage.getItem(STORAGE_KEY);
+        if (idx) catalogueIndex = JSON.parse(idx);
+        const r = localStorage.getItem(REPO_KEY);
+        if (r) repo = JSON.parse(r);
+      } catch(e) {}
+    }
+
+    // ── DOM refs ───────────────────────────────────────────────────────────
+    const fileInput       = document.getElementById('fileInput');
+    const uploadZone      = document.getElementById('uploadZone');
+    const uploadLabel     = document.getElementById('uploadLabel');
+    const generateBtn     = document.getElementById('generateBtn');
+    const results         = document.getElementById('results');
+    const baseImg         = document.getElementById('baseImg');
+    const hookImg         = document.getElementById('hookImg');
+    const hookCanvas      = document.getElementById('hookCanvas');
+    const hookPanelLabel  = document.getElementById('hookPanelLabel');
+    const analysisText    = document.getElementById('analysisText');
+    const againBtn        = document.getElementById('againBtn');
+    const counter         = document.getElementById('counter');
+    const errorMsg        = document.getElementById('errorMsg');
+    const apiKeyInput     = document.getElementById('apiKey');
+    const newUrlInput     = document.getElementById('newUrl');
+    const addUrlBtn       = document.getElementById('addUrlBtn');
+    const repoList        = document.getElementById('repoList');
+    const repoCount       = document.getElementById('repoCount');
+    const indexBtn        = document.getElementById('indexBtn');
+    const indexStatus     = document.getElementById('indexStatus');
+    const indexProgress   = document.getElementById('indexProgress');
+    const matchBadgeWrap  = document.getElementById('matchBadgeWrap');
+
+    // ── Render repo list ───────────────────────────────────────────────────
     function renderRepo() {
       repoList.innerHTML = '';
       repo.forEach((url, i) => {
+        const meta = catalogueIndex[url];
         const item = document.createElement('div');
         item.className = 'repo-item';
-        item.innerHTML = `<span title="${url}">${url}</span><button onclick="removeUrl(${i})" title="Remove">×</button>`;
+        const tagsHtml = meta
+          ? `<div class="repo-item-tags">
+               <span class="tag category">${meta.category}</span>
+               <span class="tag mechanic">${meta.mechanic}</span>
+             </div>`
+          : '';
+        item.innerHTML = `
+          <span class="repo-item-url" title="${url}">${url}</span>
+          ${tagsHtml}
+          <button onclick="removeUrl(${i})" title="Remove">×</button>`;
         repoList.appendChild(item);
       });
       repoCount.textContent = `${repo.length} image${repo.length === 1 ? '' : 's'} in catalogue`;
+      updateIndexStatus();
+    }
+
+    function updateIndexStatus() {
+      const indexed = repo.filter(u => catalogueIndex[u]).length;
+      const total   = repo.length;
+      if (indexed === 0) {
+        indexStatus.innerHTML = '<strong>Not indexed</strong> — run indexing before generating';
+      } else if (indexed < total) {
+        indexStatus.innerHTML = `<strong>${indexed} of ${total}</strong> decks indexed — re-run to index new additions`;
+      } else {
+        indexStatus.innerHTML = `<strong>All ${total} decks indexed</strong> — ready to generate`;
+      }
     }
 
     function removeUrl(i) {
+      const url = repo[i];
       repo.splice(i, 1);
+      delete catalogueIndex[url];
+      saveState();
       renderRepo();
     }
 
     addUrlBtn.addEventListener('click', () => {
       const val = newUrlInput.value.trim();
       if (!val.startsWith('http')) return;
+      if (repo.includes(val)) return;
       repo.push(val);
       newUrlInput.value = '';
+      saveState();
       renderRepo();
     });
 
-    newUrlInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') addUrlBtn.click();
-    });
+    newUrlInput.addEventListener('keydown', e => { if (e.key === 'Enter') addUrlBtn.click(); });
 
+    // ── File upload ────────────────────────────────────────────────────────
     fileInput.addEventListener('change', e => {
       const file = e.target.files[0];
       if (!file) return;
@@ -607,47 +472,187 @@
         uploadLabel.textContent = file.name;
         generateBtn.disabled = false;
         errorMsg.style.display = 'none';
+        detectedCategory = null;
       };
       reader.readAsDataURL(file);
     });
 
-    generateBtn.addEventListener('click', () => runGenerate());
-    againBtn.addEventListener('click', () => runGenerate());
-
-    function pickRandom() {
-      if (repo.length === 0) return null;
-      let idx;
-      do { idx = Math.floor(Math.random() * repo.length); } while (idx === lastIndex && repo.length > 1);
-      lastIndex = idx;
-      return { url: repo[idx], idx };
-    }
-
+    // ── Helpers ────────────────────────────────────────────────────────────
     function showError(msg) {
       errorMsg.textContent = msg;
       errorMsg.style.display = 'block';
     }
+
+    function cropToCanvas(img, canvas) {
+      const cropWidth = Math.floor(img.naturalWidth * 0.22);
+      canvas.width  = cropWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0, cropWidth, img.naturalHeight, 0, 0, cropWidth, img.naturalHeight);
+    }
+
+    async function callGemini(apiKey, parts, systemPrompt) {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ role: 'user', parts }],
+            generationConfig: { maxOutputTokens: 300 }
+          })
+        }
+      );
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`API ${res.status}: ${err?.error?.message || 'Unknown error'}`);
+      }
+      const data = await res.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+    }
+
+    // ── Indexing ───────────────────────────────────────────────────────────
+    indexBtn.addEventListener('click', runIndexing);
+
+    async function runIndexing() {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) { showError('Enter your Gemini API key before indexing.'); return; }
+
+      const unindexed = repo.filter(u => !catalogueIndex[u]);
+      if (unindexed.length === 0) {
+        indexStatus.innerHTML = '<strong>All decks already indexed.</strong> Add new URLs to re-run.';
+        return;
+      }
+
+      indexBtn.disabled = true;
+      indexBtn.textContent = 'Indexing…';
+      indexProgress.classList.add('visible');
+
+      for (let i = 0; i < unindexed.length; i++) {
+        const url = unindexed[i];
+        indexProgress.textContent = `Analysing ${i + 1} of ${unindexed.length}…`;
+        try {
+          const prompt = `You are tagging a video concept deck for a content production company.
+Analyse this concept deck image and return ONLY a JSON object with two fields:
+- "category": one of [${CATEGORIES.map(c => `"${c}"`).join(', ')}]
+- "mechanic": one of [${MECHANICS.map(m => `"${m}"`).join(', ')}]
+
+Choose the single best match for each. Return only the raw JSON object, no markdown, no explanation.`;
+
+          const text = await callGemini(apiKey, [
+            { image_url: { url } },
+            { text: 'Tag this concept deck.' }
+          ], prompt);
+
+          const clean = text.replace(/```json|```/g, '').trim();
+          const parsed = JSON.parse(clean);
+          if (CATEGORIES.includes(parsed.category) && MECHANICS.includes(parsed.mechanic)) {
+            catalogueIndex[url] = { category: parsed.category, mechanic: parsed.mechanic };
+          }
+        } catch(e) {
+          console.warn('Failed to index', url, e);
+        }
+        saveState();
+        renderRepo();
+        // small delay to avoid rate limiting
+        if (i < unindexed.length - 1) await new Promise(r => setTimeout(r, 500));
+      }
+
+      indexBtn.disabled = false;
+      indexBtn.textContent = 'Index catalogue';
+      indexProgress.classList.remove('visible');
+      saveState();
+      renderRepo();
+    }
+
+    // ── Category detection for uploaded deck ──────────────────────────────
+    async function detectUploadCategory(apiKey) {
+      const prompt = `You are categorising a video concept deck for a content production company.
+Look at this concept deck and return ONLY a JSON object with one field:
+- "category": one of [${CATEGORIES.map(c => `"${c}"`).join(', ')}]
+
+Return only the raw JSON object, no markdown, no explanation.`;
+
+      const text = await callGemini(apiKey, [
+        { inline_data: { mime_type: 'image/jpeg', data: uploadedBase64.split(',')[1] } },
+        { text: 'What product category is this concept deck for?' }
+      ], prompt);
+
+      const clean = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+      return CATEGORIES.includes(parsed.category) ? parsed.category : null;
+    }
+
+    // ── Pick a matching deck ───────────────────────────────────────────────
+    function pickMatch(category) {
+      const indexed = repo.filter(u => catalogueIndex[u]);
+      if (indexed.length === 0) return { url: repo[Math.floor(Math.random() * repo.length)], matched: false };
+
+      const matches = category
+        ? indexed.filter(u => catalogueIndex[u].category === category)
+        : [];
+
+      const pool = matches.length > 0 ? matches : indexed;
+      const matched = matches.length > 0;
+
+      // avoid repeating last shown
+      const filtered = pool.filter(u => u !== lastUrl);
+      const selected = filtered.length > 0 ? filtered : pool;
+      const url = selected[Math.floor(Math.random() * selected.length)];
+      return { url, matched };
+    }
+
+    // ── Generate ───────────────────────────────────────────────────────────
+    generateBtn.addEventListener('click', () => runGenerate());
+    againBtn.addEventListener('click', () => runGenerate());
 
     async function runGenerate() {
       const apiKey = apiKeyInput.value.trim();
       if (!apiKey) { showError('Please enter your Gemini API key above.'); return; }
       if (repo.length === 0) { showError('No images in repository. Add some URLs below.'); return; }
 
+      const indexed = repo.filter(u => catalogueIndex[u]).length;
+      if (indexed === 0) { showError('Please index the catalogue first so hooks can be matched by category.'); return; }
+
       errorMsg.style.display = 'none';
       generateBtn.disabled = true;
       againBtn.disabled = true;
       generateBtn.textContent = 'Generating…';
+      matchBadgeWrap.innerHTML = '';
 
       results.classList.add('visible');
       analysisText.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
-      hookImg.style.opacity = '0.3';
+      hookCanvas.getContext('2d').clearRect(0, 0, hookCanvas.width, hookCanvas.height);
 
-      const pick = pickRandom();
-      if (!pick) return;
-      const { url, idx } = pick;
-      hookIndex.textContent = `${idx + 1} of ${repo.length}`;
+      // Detect category of uploaded deck (cache it so "Try another" skips re-detection)
+      if (!detectedCategory) {
+        try {
+          detectedCategory = await detectUploadCategory(apiKey);
+        } catch(e) {
+          detectedCategory = null;
+        }
+      }
 
+      const { url, matched } = pickMatch(detectedCategory);
+      lastUrl = url;
+
+      const meta = catalogueIndex[url];
+      hookPanelLabel.innerHTML = `Opening hook${meta
+        ? ` <span class="tag category">${meta.category}</span><span class="tag mechanic">${meta.mechanic}</span>`
+        : ''}`;
+
+      // Match badge
+      if (detectedCategory) {
+        const badgeClass = matched ? 'matched' : 'fallback';
+        const badgeText  = matched
+          ? `Matched on <strong>${detectedCategory}</strong>`
+          : `No <strong>${detectedCategory}</strong> match — showing closest available`;
+        matchBadgeWrap.innerHTML = `<div class="match-badge ${badgeClass}"><span class="match-dot"></span><span>${badgeText}</span></div>`;
+      }
+
+      const repoIdx = repo.indexOf(url);
       const loaded = await new Promise(resolve => {
-        hookImg.onload = () => resolve(true);
+        hookImg.onload  = () => resolve(true);
         hookImg.onerror = () => resolve(false);
         hookImg.src = url;
       });
@@ -660,7 +665,7 @@
         return;
       }
 
-      hookImg.style.opacity = '1';
+      cropToCanvas(hookImg, hookCanvas);
       useCount++;
       counter.textContent = `${useCount} hook${useCount === 1 ? '' : 's'} generated this session`;
 
@@ -671,49 +676,32 @@
       generateBtn.textContent = 'Generate hook inspiration';
     }
 
+    // ── Analyse hook ───────────────────────────────────────────────────────
     async function analyseHook(url, apiKey) {
-      const SYSTEM_PROMPT = "You are a creative director at a video production company that makes short-form social media content. You will be shown a concept deck image. The deck follows a consistent layout: a series of 9:16 vertical frames shown side by side, with a pink text box above each frame. The FIRST (leftmost) frame and its pink text box above it is the OPENING HOOK of the video. Analyse only the opening hook — the first frame and its headline — and describe the hook concept concisely in 2-3 sentences. Explain: (1) what the visual or narrative device is, (2) what makes it attention-grabbing, (3) what kind of product or brand it might suit. Be specific and creative-director-level insightful. Do not describe the whole deck — only the opening hook.";
+      const SYSTEM_PROMPT = `You are a creative director at a video production company that makes short-form social media content.
+You will be shown a concept deck image. The deck follows a consistent layout: a series of 9:16 vertical frames shown side by side, with a pink text box above each frame.
+The FIRST (leftmost) frame and its pink text box above it is the OPENING HOOK of the video.
+Analyse only the opening hook — the first frame and its headline — and describe the hook concept concisely in 2-3 sentences.
+Explain: (1) what the visual or narrative device is, (2) what makes it attention-grabbing, (3) what kind of product or brand it might suit.
+Be specific and creative-director-level insightful. Do not describe the whole deck — only the opening hook.`;
 
       try {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-              contents: [
-                {
-                  role: "user",
-                  parts: [
-                    { image_url: { url } },
-                    { text: "Analyse the opening hook of this concept deck (first frame + its headline text above). Describe the hook concept in 2-3 sentences." }
-                  ]
-                }
-              ],
-              generationConfig: { maxOutputTokens: 1000 }
-            })
-          }
-        );
-
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          if (res.status === 400 || res.status === 401 || res.status === 403) {
-            analysisText.textContent = 'Invalid API key or access denied. Please check and try again.';
-          } else {
-            analysisText.textContent = `API error (${res.status}): ${err?.error?.message || 'Unknown error'}`;
-          }
-          return;
+        const text = await callGemini(apiKey, [
+          { image_url: { url } },
+          { text: 'Analyse the opening hook of this concept deck.' }
+        ], SYSTEM_PROMPT);
+        analysisText.textContent = text || 'No analysis returned.';
+      } catch(err) {
+        if (err.message.includes('401') || err.message.includes('403')) {
+          analysisText.textContent = 'Invalid API key or access denied. Please check and try again.';
+        } else {
+          analysisText.textContent = `Could not analyse: ${err.message}`;
         }
-
-        const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No analysis returned.';
-        analysisText.textContent = text;
-      } catch (err) {
-        analysisText.textContent = 'Could not reach the API. Check your connection and try again.';
       }
     }
 
+    // ── Init ───────────────────────────────────────────────────────────────
+    restoreState();
     renderRepo();
   </script>
 </body>
