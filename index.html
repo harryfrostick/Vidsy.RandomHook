@@ -3,827 +3,576 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hook Generator</title>
+  <title>Deck Flow Matcher</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;1,400&family=DM+Serif+Display:ital@1&display=swap" rel="stylesheet">
   <style>
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #ffffff;
-      --bg-secondary: #f7f6f3;
-      --bg-tertiary: #f0ede8;
-      --text-primary: #1a1a18;
-      --text-secondary: #5f5e5a;
-      --text-tertiary: #9a9892;
-      --border: rgba(0,0,0,0.1);
-      --border-mid: rgba(0,0,0,0.18);
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --pink: #f2c4ce;
-      --pink-dark: #e8637a;
-      --pink-text: #5a1a26;
+      --bg: #ffffff; --bg-secondary: #f7f6f3; --bg-tertiary: #f0ede8;
+      --text-primary: #1a1a18; --text-secondary: #5f5e5a; --text-tertiary: #9a9892;
+      --border: rgba(0,0,0,0.1); --border-mid: rgba(0,0,0,0.18);
+      --radius-md: 8px; --radius-lg: 12px;
+      --pink: #f2c4ce; --pink-dark: #e8637a; --pink-text: #5a1a26;
     }
-
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #1c1c1a;
-        --bg-secondary: #242422;
-        --bg-tertiary: #2c2c2a;
-        --text-primary: #f0ede8;
-        --text-secondary: #b4b2a9;
-        --text-tertiary: #6e6c68;
-        --border: rgba(255,255,255,0.09);
-        --border-mid: rgba(255,255,255,0.16);
+        --bg: #1c1c1a; --bg-secondary: #242422; --bg-tertiary: #2c2c2a;
+        --text-primary: #f0ede8; --text-secondary: #b4b2a9; --text-tertiary: #6e6c68;
+        --border: rgba(255,255,255,0.09); --border-mid: rgba(255,255,255,0.16);
       }
     }
-
-    html, body {
-      min-height: 100vh;
-      background: var(--bg-tertiary);
-      font-family: 'DM Sans', system-ui, sans-serif;
-      color: var(--text-primary);
-    }
-
-    .page { max-width: 880px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    html, body { min-height: 100vh; background: var(--bg-tertiary); font-family: 'DM Sans', system-ui, sans-serif; color: var(--text-primary); }
+    .page { max-width: 920px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
 
     /* Header */
-    .header { margin-bottom: 3rem; display: flex; align-items: baseline; gap: 14px; }
-    .header h1 {
-      font-family: 'DM Serif Display', serif; font-style: italic;
-      font-size: 32px; font-weight: 400; letter-spacing: -0.01em;
-    }
-    .header-sub { font-size: 14px; color: var(--text-tertiary); }
+    .header { margin-bottom: 2.5rem; }
+    .header h1 { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 32px; font-weight: 400; letter-spacing: -0.01em; }
+    .header p { font-size: 14px; color: var(--text-tertiary); margin-top: 4px; }
 
-    /* Card */
-    .card {
-      background: var(--bg); border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1rem;
-    }
-    .card-label {
-      font-size: 11px; font-weight: 500; color: var(--text-tertiary);
-      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
-    }
+    /* Section headers */
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; }
+    .section-header h2 { font-size: 17px; font-weight: 500; letter-spacing: -0.02em; }
+    .section-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; background: var(--pink); color: var(--pink-text); }
+
+    /* Cards */
+    .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+    .card-label { font-size: 11px; font-weight: 500; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
 
     /* Inputs */
-    .text-input {
-      width: 100%; padding: 9px 12px; font-family: inherit; font-size: 14px;
-      background: var(--bg-secondary); border: 0.5px solid var(--border);
-      border-radius: var(--radius-md); color: var(--text-primary); outline: none;
-    }
+    .text-input { width: 100%; padding: 9px 12px; font-family: inherit; font-size: 14px; background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); outline: none; }
     .text-input:focus { border-color: var(--border-mid); }
     textarea.text-input { resize: none; line-height: 1.5; }
     .input-hint { font-size: 12px; color: var(--text-tertiary); margin-top: 6px; }
     .input-hint a { color: var(--pink-dark); text-decoration: none; }
 
-    /* Two-col inputs */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
-    @media (max-width: 560px) { .two-col { grid-template-columns: 1fr; } }
-
-    /* Upload zones */
-    .upload-zone {
-      border: 1.5px dashed var(--border-mid); border-radius: var(--radius-lg);
-      padding: 1.75rem 1.5rem; text-align: center; cursor: pointer;
-      position: relative; background: var(--bg);
-      transition: border-color 0.2s, background 0.2s;
-    }
+    /* Upload zone */
+    .upload-zone { border: 1.5px dashed var(--border-mid); border-radius: var(--radius-lg); padding: 1.75rem 1.5rem; text-align: center; cursor: pointer; position: relative; background: var(--bg); transition: border-color 0.2s; margin-bottom: 1rem; }
     .upload-zone:hover { border-color: var(--text-tertiary); }
     .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
     .upload-zone svg { margin: 0 auto 8px; display: block; color: var(--text-tertiary); }
     .upload-zone p { font-size: 13px; color: var(--text-secondary); }
     .upload-zone span { font-size: 11px; color: var(--text-tertiary); display: block; margin-top: 3px; }
-    .upload-zone.has-files { border-style: solid; padding: 1rem 1.5rem; }
-    .upload-zone.has-files svg { display: none; }
-    .upload-zone.has-files span.hint { display: none; }
-
+    .upload-zone.has-file { border-style: solid; border-color: var(--border); padding: 1rem 1.5rem; }
+    .upload-zone.has-file svg { display: none; }
+    .upload-zone.has-file .hint { display: none; }
     .file-chips { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 8px; }
-    .file-chip {
-      font-size: 11px; padding: 2px 9px; background: var(--bg-secondary);
-      border-radius: 20px; color: var(--text-secondary); border: 0.5px solid var(--border);
+    .file-chip { font-size: 11px; padding: 2px 9px; background: var(--bg-secondary); border-radius: 20px; color: var(--text-secondary); border: 0.5px solid var(--border); }
+
+    /* Buttons */
+    .btn {
+      padding: 11px 20px; font-family: inherit; font-size: 14px; font-weight: 500;
+      border: 0.5px solid var(--border-mid); border-radius: var(--radius-md);
+      background: var(--bg); color: var(--text-primary); cursor: pointer;
+      transition: background 0.15s, opacity 0.15s; white-space: nowrap;
     }
-    /* Generate button */
-    .generate-btn {
-      width: 100%; padding: 15px; font-family: inherit; font-size: 15px; font-weight: 500;
-      border: none; border-radius: var(--radius-lg);
-      background: var(--text-primary); color: var(--bg); cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s; margin-bottom: 0.5rem;
-      letter-spacing: -0.01em;
-    }
-    .generate-btn:hover:not(:disabled) { opacity: 0.85; }
-    .generate-btn:active:not(:disabled) { transform: scale(0.99); }
-    .generate-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn:hover:not(:disabled) { background: var(--bg-secondary); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-primary { background: var(--text-primary); color: var(--bg); border-color: var(--text-primary); }
+    .btn-primary:hover:not(:disabled) { opacity: 0.85; background: var(--text-primary); }
+    .btn-accent { background: var(--pink-dark); color: white; border-color: var(--pink-dark); }
+    .btn-accent:hover:not(:disabled) { opacity: 0.88; background: var(--pink-dark); }
+    .btn-full { width: 100%; margin-bottom: 0.5rem; padding: 14px; font-size: 15px; letter-spacing: -0.01em; }
+
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
 
     .error-msg { font-size: 13px; color: #c0392b; text-align: center; display: none; margin-top: 6px; }
 
     /* Progress */
-    .progress-wrap {
-      display: none; margin: 1.5rem 0; background: var(--bg);
-      border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
-    }
+    .progress-wrap { display: none; margin: 1.5rem 0; background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
     .progress-wrap.visible { display: block; }
     .progress-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
     .progress-bar-track { height: 3px; background: var(--bg-tertiary); border-radius: 2px; overflow: hidden; }
-    .progress-bar-fill {
-      height: 100%; background: var(--pink-dark); border-radius: 2px;
-      width: 0%; transition: width 0.3s ease;
-    }
+    .progress-bar-fill { height: 100%; background: var(--pink-dark); border-radius: 2px; width: 0%; transition: width 0.3s ease; }
 
-    /* Results */
-    .results { display: none; margin-top: 2.5rem; }
-    .results.visible { display: block; }
-    .results-header {
-      display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.25rem;
-    }
-    .results-header h2 { font-size: 15px; font-weight: 500; }
-    .results-header span { font-size: 12px; color: var(--text-tertiary); }
+    /* Two-panel result */
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+    @media (max-width: 600px) { .result-grid { grid-template-columns: 1fr; } }
 
-    /* Hook gallery */
-    .hook-gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 1.25rem;
-    }
+    .result-panel { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .result-panel-header { padding: 10px 14px; font-size: 11px; font-weight: 500; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 0.5px solid var(--border); background: var(--bg-secondary); display: flex; align-items: center; justify-content: space-between; }
+    .result-panel canvas, .result-panel img { width: 100%; display: block; }
 
-    .hook-card {
-      background: var(--bg); border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.2s;
-    }
-    .hook-card:hover { border-color: var(--border-mid); }
+    /* Flow cards */
+    .flow-card { padding: 1.25rem 1.5rem; }
+    .flow-field { margin-bottom: 12px; }
+    .flow-field:last-child { margin-bottom: 0; }
+    .flow-key { font-size: 10px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+    .flow-val { font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+    .flow-arc { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .arc-step { font-size: 12px; padding: 3px 10px; background: var(--bg-secondary); border-radius: 20px; color: var(--text-secondary); border: 0.5px solid var(--border); }
+    .arc-arrow { color: var(--text-tertiary); font-size: 12px; }
+    .flow-tag { display: inline-block; font-size: 11px; padding: 2px 8px; background: var(--pink); color: var(--pink-text); border-radius: 4px; margin-right: 4px; }
+    @media (prefers-color-scheme: dark) { .flow-tag { background: #3a1520; color: #f08098; } }
 
-    .hook-caption {
-      background: var(--pink); padding: 10px 12px;
-      font-size: 12px; line-height: 1.45; color: var(--pink-text);
-      font-style: italic; font-family: 'DM Serif Display', serif;
-      min-height: 50px; display: flex; align-items: center;
-    }
-    @media (prefers-color-scheme: dark) {
-      .hook-caption { background: #4a1e28; color: #f5c4ce; }
-    }
+    /* Match score badge */
+    .match-score { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: #edf7ed; color: #2d7a2d; }
+    @media (prefers-color-scheme: dark) { .match-score { background: #1a3a1a; color: #7ecf7e; } }
 
-    .hook-frame-wrap {
-      position: relative; background: #111; aspect-ratio: 9/16; overflow: hidden;
-    }
-    .hook-frame-wrap canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .hook-timestamp {
-      position: absolute; bottom: 8px; right: 8px;
-      background: rgba(0,0,0,0.55); color: white;
-      font-size: 10px; padding: 2px 6px; border-radius: 4px;
-    }
-
-    .hook-card-footer {
-      padding: 8px 10px; display: flex; align-items: center;
-      justify-content: space-between; border-top: 0.5px solid var(--border);
-    }
-    .hook-card-footer span {
-      font-size: 11px; color: var(--text-tertiary);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px;
-    }
-    .dl-btn {
-      font-family: inherit; font-size: 11px; font-weight: 500; padding: 4px 10px;
-      border: 0.5px solid var(--border-mid); border-radius: 6px;
-      background: var(--bg); color: var(--text-secondary); cursor: pointer;
-      text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
-      transition: background 0.15s; flex-shrink: 0;
-    }
-    .dl-btn:hover { background: var(--bg-secondary); }
+    /* Index panel */
+    .index-panel { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+    .index-status { font-size: 13px; color: var(--text-secondary); }
+    .index-status strong { color: var(--text-primary); }
+    .index-progress-text { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; display: none; }
+    .index-progress-text.visible { display: block; }
 
     /* Divider */
-    .divider {
-      border: none; border-top: 0.5px solid var(--border);
-      margin: 2.5rem 0 2rem;
-    }
-    .section-title {
-      font-size: 13px; font-weight: 500; color: var(--text-tertiary);
-      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem;
-    }
+    .divider { border: none; border-top: 0.5px solid var(--border); margin: 3rem 0 2.5rem; }
+
+    /* Results hidden */
+    .result-section { display: none; }
+    .result-section.visible { display: block; }
+
+    /* Video gallery */
+    .hook-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    @media (max-width: 600px) { .hook-gallery { grid-template-columns: repeat(2, 1fr); } }
+    .hook-card { background: var(--bg); border: 2px solid transparent; border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: border-color 0.15s, transform 0.1s; }
+    .hook-card:hover { border-color: var(--border-mid); transform: scale(1.01); }
+    .hook-card.selected { border-color: var(--pink-dark); }
+    .hook-frame-wrap { position: relative; background: #111; aspect-ratio: 9/16; overflow: hidden; }
+    .hook-frame-wrap canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hook-timestamp { position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.55); color: white; font-size: 10px; padding: 2px 5px; border-radius: 4px; }
+    .hook-select-badge { position: absolute; top: 6px; left: 6px; background: var(--pink-dark); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; display: none; }
+    .hook-card.selected .hook-select-badge { display: block; }
+    .hook-rec-badge { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.5); color: #ffd700; font-size: 12px; padding: 2px 5px; border-radius: 4px; }
+    .hook-card-label { padding: 6px 8px; font-size: 11px; color: var(--text-tertiary); border-top: 0.5px solid var(--border); text-align: center; }
+    .hook-card.selected .hook-card-label { color: var(--pink-dark); font-weight: 500; }
+
+    /* Merge panel */
+    .merge-panel { display: none; }
+    .merge-panel.visible { display: block; margin-top: 1.5rem; }
+    .caption-row { display: flex; gap: 10px; align-items: flex-start; }
+    .caption-row .text-input { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 15px; }
+    .merge-result { display: none; margin-top: 1.5rem; }
+    .merge-result.visible { display: block; }
 
     /* Loading dots */
     .loading-dots { display: inline-flex; gap: 4px; align-items: center; }
-    .loading-dots span {
-      width: 4px; height: 4px; border-radius: 50%; background: var(--text-tertiary);
-      animation: db 1.2s ease-in-out infinite;
-    }
+    .loading-dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--text-tertiary); animation: db 1.2s ease-in-out infinite; }
     .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes db {
-      0%,80%,100% { transform: scale(0.6); opacity: 0.3; }
-      40% { transform: scale(1); opacity: 1; }
-    }
-
-    /* Inspiration section */
-    .inspo-row {
-      display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-    .inspo-btn {
-      padding: 10px 18px; font-family: inherit; font-size: 14px; font-weight: 500;
-      border: 0.5px solid var(--border-mid); border-radius: var(--radius-md);
-      background: var(--bg); color: var(--text-primary); cursor: pointer;
-      transition: background 0.15s;
-    }
-    .inspo-btn:hover:not(:disabled) { background: var(--bg-secondary); }
-    .inspo-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-
-    .inspo-result {
-      display: none; margin-top: 1.5rem;
-    }
-    .inspo-result.visible { display: block; }
-
-    .inspo-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;
-    }
-    @media (max-width: 560px) { .inspo-grid { grid-template-columns: 1fr; } }
-
-    .inspo-panel {
-      background: var(--bg); border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg); overflow: hidden;
-    }
-    .inspo-panel-label {
-      padding: 8px 12px; font-size: 11px; font-weight: 500; color: var(--text-tertiary);
-      text-transform: uppercase; letter-spacing: 0.08em;
-      border-bottom: 0.5px solid var(--border); background: var(--bg-secondary);
-    }
-    .inspo-panel img { width: 100%; display: block; }
-    .inspo-panel canvas { width: 100%; display: block; }
-
-    .inspo-analysis {
-      background: var(--bg); border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-top: 1rem;
-    }
-    .inspo-analysis .card-label { margin-bottom: 8px; }
-    .inspo-analysis p { font-size: 14px; line-height: 1.75; color: var(--text-primary); }
-
-    .tag { 
-      display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 7px;
-      border-radius: 4px; margin-left: 5px; vertical-align: middle;
-      background: #fde8ec; color: #c0344f; text-transform: none; letter-spacing: 0;
-    }
-    @media (prefers-color-scheme: dark) { .tag { background: #3a1520; color: #f08098; } }
-
-    .match-badge {
-      display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
-      font-weight: 500; padding: 4px 10px; border-radius: 20px; margin-bottom: 1rem;
-    }
-    .match-badge.matched { background: #edf7ed; color: #2d7a2d; }
-    .match-badge.fallback { background: #fef6e4; color: #8a6200; }
-    @media (prefers-color-scheme: dark) {
-      .match-badge.matched { background: #1a3a1a; color: #7ecf7e; }
-      .match-badge.fallback { background: #3a2e00; color: #f0c040; }
-    }
-    .match-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .match-badge.matched .match-dot { background: #2d7a2d; }
-    .match-badge.fallback .match-dot { background: #c08000; }
+    @keyframes db { 0%,80%,100% { transform: scale(0.6); opacity: 0.3; } 40% { transform: scale(1); opacity: 1; } }
+  
   </style>
 </head>
 <body>
 <div class="page">
 
   <div class="header">
-    <h1>Hook Generator</h1>
-    <span class="header-sub">video → opening hook ideas</span>
+    <h1>Deck Flow Matcher</h1>
+    <p>Upload a concept deck — find the closest match from your repository.</p>
   </div>
 
-  <!-- API Key -->
   <div class="card">
     <div class="card-label">Gemini API key</div>
     <input type="password" class="text-input" id="apiKey" placeholder="AIza..." autocomplete="off">
     <p class="input-hint">Entered each session — never stored. Get one at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></p>
   </div>
 
-  <!-- Two column: video upload + keywords -->
-  <div class="two-col">
-    <div class="upload-zone" id="videoZone">
-      <input type="file" accept="video/*" multiple id="videoInput">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="2" y="5" width="20" height="14" rx="2"/>
-        <path d="M10 9l5 3-5 3V9z"/>
-      </svg>
-      <p id="videoLabel">Upload video files</p>
-      <span class="hint">MP4, MOV, WEBM — under 60s</span>
-      <div class="file-chips" id="videoChips"></div>
-    </div>
-
-    <div class="card" style="margin-bottom:0;">
-      <div class="card-label">Keywords / objectives</div>
-      <textarea class="text-input" id="keywords" rows="4" placeholder="e.g. zero sugar, summer feeling, Gen Z audience, product reveal"></textarea>
-    </div>
+  <div class="upload-zone" id="deckZone">
+    <input type="file" accept="image/*" id="deckInput">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <path d="M3 9h18M9 21V9"/>
+    </svg>
+    <p id="deckLabel">Upload your concept deck (.png or .jpg)</p>
+    <span class="hint">The app will parse its narrative flow and find a matching deck</span>
+    <div class="file-chips" id="deckChips"></div>
   </div>
 
-  <button class="generate-btn" id="generateBtn" disabled>Generate hook ideas</button>
-  <p class="error-msg" id="errorMsg"></p>
+  <button class="btn btn-primary btn-full" id="matchBtn" disabled>Find matching deck</button>
+  <p class="error-msg" id="matchError"></p>
 
-  <!-- Progress -->
-  <div class="progress-wrap" id="progressWrap">
-    <div class="progress-label" id="progressLabel">Extracting frames…</div>
-    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <div class="progress-wrap" id="matchProgress">
+    <div class="progress-label" id="matchProgressLabel">Analysing deck flow…</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="matchProgressFill"></div></div>
   </div>
 
-  <!-- Results: hook gallery -->
-  <div class="results" id="results">
-    <div class="results-header">
-      <h2 id="resultsTitle">Hook candidates</h2>
-      <span id="resultsSubtitle"></span>
-    </div>
-    <div class="hook-gallery" id="hookGallery"></div>
-  </div>
-
-  <!-- Divider: inspiration section -->
-  <hr class="divider">
-  <p class="section-title">Catalogue inspiration</p>
-
-  <!-- Inspiration controls -->
-  <div class="card">
-    <div class="card-label">Match keywords</div>
-    <input type="text" class="text-input" id="inspoKeywords" placeholder="e.g. transformation, lifestyle, urban">
-    <p class="input-hint" style="margin-top:6px;">Tags from your catalogue will be matched against these words</p>
-  </div>
-
-  <div class="inspo-row">
-    <button class="inspo-btn" id="inspoBtn" disabled>Find inspiration</button>
-    <button class="inspo-btn" id="inspoAgainBtn" disabled style="display:none;">Try another</button>
-  </div>
-
-  <div class="inspo-result" id="inspoResult">
-    <div id="inspoBadgeWrap"></div>
-    <div class="inspo-grid">
-      <div class="inspo-panel" id="inspoUploadPanel" style="display:none;">
-        <div class="inspo-panel-label">Your deck</div>
-        <img id="inspoBaseImg" src="" alt="">
+  <div class="result-section" id="matchResult">
+    <div class="result-grid">
+      <div>
+        <div class="result-panel">
+          <div class="result-panel-header"><span>Your deck — parsed flow</span></div>
+          <div class="flow-card" id="uploadedFlow"></div>
+        </div>
       </div>
-      <div class="inspo-panel">
-        <div class="inspo-panel-label" id="inspoPanelLabel">Opening hook</div>
-        <img id="inspoHookImg" src="" alt="" style="display:none" crossorigin="anonymous">
-        <canvas id="inspoCanvas" style="width:100%;display:block;"></canvas>
+      <div>
+        <div class="result-panel" id="matchedPanel">
+          <div class="result-panel-header">
+            <span>Best match from repository</span>
+            <span class="match-score" id="matchScoreLabel"></span>
+          </div>
+          <img id="matchedHookImg" src="" alt="" style="display:none" crossorigin="anonymous">
+          <canvas id="matchedCanvas" style="width:100%;display:block;"></canvas>
+        </div>
+        <div class="result-panel" style="margin-top:1rem;">
+          <div class="result-panel-header"><span>Matched flow</span></div>
+          <div class="flow-card" id="matchedFlow"></div>
+        </div>
       </div>
     </div>
-    <div class="inspo-analysis">
-      <div class="card-label">Hook concept</div>
-      <p id="inspoAnalysis"><span class="loading-dots"><span></span><span></span><span></span></span></p>
+    <div class="btn-row" style="margin-top:1.25rem;">
+      <button class="btn" id="tryAnotherBtn">Try next best match</button>
     </div>
   </div>
+
+  <div class="divider" style="margin: 2rem 0 1.5rem;"></div>
+  <details>
+    <summary style="font-size:13px;font-weight:500;color:var(--text-tertiary);cursor:pointer;user-select:none;margin-bottom:1rem;">Repository management</summary>
+    <div class="index-panel">
+      <div class="index-status" id="indexStatus"><strong>Loading repository…</strong></div>
+      <div class="index-progress-text" id="indexProgressText"></div>
+      <div class="btn-row" style="margin-top:1rem;margin-bottom:0;">
+        <button class="btn btn-accent" id="indexBtn">Index new decks</button>
+        <button class="btn" id="downloadRepoBtn">Download repository.json</button>
+      </div>
+      <p class="input-hint" style="margin-top:8px;">After indexing, download and commit repository.json to your Netlify repo.</p>
+    </div>
+  </details>
 
 </div>
-
 <script>
-  // ── URL reconstruction ─────────────────────────────────────────────────────
-  // CSV stores truncated paths like .../TJX9vB.png
-  // Real URLs: https://imagizer.imageshack.com/imgXXX/NNNN/FILENAME.png
-  // We map known filenames to their full URLs from the original repository
-  const KNOWN_URLS = {
-    "TJX9vB.png": "https://imagizer.imageshack.com/img922/3343/TJX9vB.png",
-    "zWO49p.png": "https://imagizer.imageshack.com/img921/5669/zWO49p.png",
-    "6ADXka.png": "https://imagizer.imageshack.com/img921/7113/6ADXka.png",
-    "wnQy9T.png": "https://imagizer.imageshack.com/img921/9808/wnQy9T.png",
-    "Pymc1h.png": "https://imagizer.imageshack.com/img921/2849/Pymc1h.png",
-    "OMusg0.png": "https://imagizer.imageshack.com/img924/3917/OMusg0.png",
-    "Gc9lrf.png": "https://imagizer.imageshack.com/img924/9602/Gc9lrf.png",
-    "S2t86d.png": "https://imagizer.imageshack.com/img924/1426/S2t86d.png",
-    "7JEGAO.png": "https://imagizer.imageshack.com/img924/7683/7JEGAO.png",
-    "c1Go96.png": "https://imagizer.imageshack.com/img923/290/c1Go96.png",
-    "laEiXD.png": "https://imagizer.imageshack.com/img921/4473/laEiXD.png",
-    "xjYCfB.png": "https://imagizer.imageshack.com/img923/4273/xjYCfB.png",
-    "iCtCzo.png": "https://imagizer.imageshack.com/img923/3737/iCtCzo.png",
-    "zoEiMR.png": "https://imagizer.imageshack.com/img921/6140/zoEiMR.png",
-    "j9hGn4.png": "https://imagizer.imageshack.com/img924/499/j9hGn4.png",
-    "t9DrLz.png": "https://imagizer.imageshack.com/img924/7636/t9DrLz.png",
-    "lYkGjh.png": "https://imagizer.imageshack.com/img922/171/lYkGjh.png",
-    "OTxEuw.png": "https://imagizer.imageshack.com/img923/7509/OTxEuw.png",
-    "zswSHL.png": "https://imagizer.imageshack.com/img922/456/zswSHL.png",
-    "uybXcP.png": "https://imagizer.imageshack.com/img922/3618/uybXcP.png",
-    "teqQXe.png": "https://imagizer.imageshack.com/img923/7342/teqQXe.png"
-  };
+// ═══════════════════════════════════════════════════════
+// SHARED
+// ═══════════════════════════════════════════════════════
+const apiKeyEl = document.getElementById('apiKey');
 
-  function resolveUrl(raw) {
-    // If already a full URL, use it
-    if (raw.startsWith('http')) return raw;
-    // Extract filename from .../filename.png
-    const match = raw.match(/([^/]+\.(?:png|jpg|jpeg|webp))$/i);
-    if (match) return KNOWN_URLS[match[1]] || null;
-    return null;
-  }
+function getApiKey() { return apiKeyEl.value.trim(); }
 
-  // ── Catalogue state ────────────────────────────────────────────────────────
-  let catalogue = []; // [{ url, tags: [t1,t2,t3] }]
-  let lastInspoUrl = null;
-
-  // ── CSV: fetch from repo on load ──────────────────────────────────────────
-  const inspoBtn      = document.getElementById('inspoBtn');
-  const inspoAgainBtn = document.getElementById('inspoAgainBtn');
-
-  function parseCSV(text) {
-    const lines = text.trim().split(/\r?\n/);
-    if (lines.length < 2) return [];
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-    const urlIdx  = headers.findIndex(h => h === 'url');
-    const tag1Idx = headers.findIndex(h => h === 'tag 1');
-    const tag2Idx = headers.findIndex(h => h === 'tag 2');
-    const tag3Idx = headers.findIndex(h => h === 'tag 3');
-    if (urlIdx === -1) return [];
-    const results = [];
-    for (let i = 1; i < lines.length; i++) {
-      const cols = lines[i].split(',').map(c => c.trim());
-      const rawUrl = cols[urlIdx] || '';
-      const url = resolveUrl(rawUrl);
-      if (!url) continue;
-      const tags = [
-        tag1Idx >= 0 ? cols[tag1Idx] : '',
-        tag2Idx >= 0 ? cols[tag2Idx] : '',
-        tag3Idx >= 0 ? cols[tag3Idx] : ''
-      ].filter(Boolean).map(t => t.toLowerCase().replace(/-/g, ' '));
-      results.push({ url, tags });
+async function callGemini(parts, systemPrompt, maxTokens = 1000) {
+  const key = getApiKey();
+  if (!key) throw new Error('No API key');
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts }],
+        generationConfig: { maxOutputTokens: maxTokens }
+      })
     }
-    return results;
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Gemini ${res.status}: ${err?.error?.message || 'Unknown'}`);
   }
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+}
 
-  async function loadCatalogue() {
+function parseJSON(raw) {
+  return JSON.parse(raw.replace(/```json|```/g, '').trim());
+}
+
+function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+function hideErr(el) { el.style.display = 'none'; }
+
+function setProgress(wrapEl, fillEl, labelEl, pct, label) {
+  wrapEl.classList.add('visible');
+  if (labelEl) labelEl.textContent = label;
+  fillEl.style.width = pct + '%';
+}
+function hideProgress(wrapEl) { wrapEl.classList.remove('visible'); }
+
+// ═══════════════════════════════════════════════════════
+// FLOW SCHEMA
+// ═══════════════════════════════════════════════════════
+const FLOW_SCHEMA = `{
+  "hook_type": one of ["trend-led","product-reveal","talking-head","transformation","social-proof","humour","challenge","POV","before-after","ASMR"],
+  "hook_device": short string describing the specific visual/narrative device e.g. "freeze frame with caption overlay",
+  "narrative_arc": array of 2-6 strings describing each beat in order e.g. ["hook","talent demo","product close-up","range reveal"],
+  "frame_count": integer number of 9:16 frames in the deck,
+  "tone": one of ["playful","aspirational","informative","urgent","emotional","comedic","premium"],
+  "caption_style": one of ["second-person tease","statement","question","challenge","product-led"],
+  "pacing": one of ["fast cut","slow burn","medium"],
+  "talent": boolean — does the deck feature a person on camera,
+  "product_visible_in_hook": boolean — is the product visible in the first frame
+}`;
+
+const FLOW_SYSTEM = `You are a concept deck analyst for a short-form video production company.
+Analyse the concept deck image provided. A concept deck shows a horizontal row of 9:16 vertical frames, each with a pink caption box above it.
+Extract the narrative and structural flow of this deck into the following JSON schema:
+${FLOW_SCHEMA}
+Return ONLY the raw JSON object. No markdown, no explanation.`;
+
+async function parseDeckFlow(base64) {
+  const raw = await callGemini([
+    { inline_data: { mime_type: 'image/jpeg', data: base64.split(',')[1] } },
+    { text: 'Analyse this concept deck and return its flow as JSON.' }
+  ], FLOW_SYSTEM, 600);
+  return parseJSON(raw);
+}
+
+// ═══════════════════════════════════════════════════════
+// REPOSITORY
+// ═══════════════════════════════════════════════════════
+// repository.json structure: [{ url, flow: {...} }, ...]
+let repository = [];
+
+async function loadRepository() {
+  try {
+    const res = await fetch('repository.json');
+    if (!res.ok) throw new Error('not found');
+    repository = await res.json();
+    updateIndexStatus();
+  } catch(e) {
+    // Fall back to CSV-derived URL list if no repository.json yet
     try {
-      const res = await fetch('repository.csv');
-      if (!res.ok) throw new Error('CSV not found');
-      const text = await res.text();
-      const parsed = parseCSV(text);
-      if (parsed.length > 0) {
-        catalogue = parsed;
-        inspoBtn.disabled = false;
-        console.log(`Catalogue loaded: ${parsed.length} decks`);
-      }
+      const res2 = await fetch('repository.csv');
+      if (!res2.ok) throw new Error();
+      const text = await res2.text();
+      const urls = parseCSVUrls(text);
+      repository = urls.map(url => ({ url, flow: null }));
+      updateIndexStatus();
+    } catch(e2) {
+      document.getElementById('indexStatus').innerHTML = '<strong>No repository found.</strong> Add repository.json or repository.csv.';
+    }
+  }
+}
+
+function updateIndexStatus() {
+  const total = repository.length;
+  const indexed = repository.filter(r => r.flow).length;
+  const el = document.getElementById('indexStatus');
+  if (indexed === 0) {
+    el.innerHTML = `<strong>${total} decks loaded</strong> — none indexed yet. Click "Index new decks" to begin.`;
+  } else if (indexed < total) {
+    el.innerHTML = `<strong>${indexed} of ${total} decks indexed.</strong> ${total - indexed} remaining — click "Index new decks" to continue.`;
+  } else {
+    el.innerHTML = `<strong>All ${total} decks indexed</strong> and ready to match.`;
+  }
+  document.getElementById('matchBtn').disabled = indexed === 0;
+}
+
+// CSV URL parsing (fallback)
+const KNOWN_URLS = {
+  "TJX9vB.png":"https://imagizer.imageshack.com/img922/3343/TJX9vB.png","zWO49p.png":"https://imagizer.imageshack.com/img921/5669/zWO49p.png","6ADXka.png":"https://imagizer.imageshack.com/img921/7113/6ADXka.png","wnQy9T.png":"https://imagizer.imageshack.com/img921/9808/wnQy9T.png","Pymc1h.png":"https://imagizer.imageshack.com/img921/2849/Pymc1h.png","OMusg0.png":"https://imagizer.imageshack.com/img924/3917/OMusg0.png","Gc9lrf.png":"https://imagizer.imageshack.com/img924/9602/Gc9lrf.png","S2t86d.png":"https://imagizer.imageshack.com/img924/1426/S2t86d.png","7JEGAO.png":"https://imagizer.imageshack.com/img924/7683/7JEGAO.png","c1Go96.png":"https://imagizer.imageshack.com/img923/290/c1Go96.png","laEiXD.png":"https://imagizer.imageshack.com/img921/4473/laEiXD.png","xjYCfB.png":"https://imagizer.imageshack.com/img923/4273/xjYCfB.png","iCtCzo.png":"https://imagizer.imageshack.com/img923/3737/iCtCzo.png","zoEiMR.png":"https://imagizer.imageshack.com/img921/6140/zoEiMR.png","j9hGn4.png":"https://imagizer.imageshack.com/img924/499/j9hGn4.png","t9DrLz.png":"https://imagizer.imageshack.com/img924/7636/t9DrLz.png","lYkGjh.png":"https://imagizer.imageshack.com/img922/171/lYkGjh.png","OTxEuw.png":"https://imagizer.imageshack.com/img923/7509/OTxEuw.png","zswSHL.png":"https://imagizer.imageshack.com/img922/456/zswSHL.png","uybXcP.png":"https://imagizer.imageshack.com/img922/3618/uybXcP.png","teqQXe.png":"https://imagizer.imageshack.com/img923/7342/teqQXe.png"
+};
+function resolveUrl(raw) {
+  if (!raw) return null;
+  if (raw.startsWith('http')) return raw;
+  const m = raw.match(/([^/]+\.(?:png|jpg|jpeg|webp))$/i);
+  return m ? (KNOWN_URLS[m[1]] || null) : null;
+}
+function parseCSVUrls(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const urlIdx = headers.findIndex(h => h === 'url');
+  if (urlIdx === -1) return [];
+  return lines.slice(1).map(l => resolveUrl(l.split(',')[urlIdx]?.trim())).filter(Boolean);
+}
+
+// ── Indexing ──────────────────────────────────────────
+document.getElementById('indexBtn').addEventListener('click', runIndexing);
+
+async function runIndexing() {
+  if (!getApiKey()) { alert('Enter your Gemini API key first.'); return; }
+  const unindexed = repository.filter(r => !r.flow);
+  if (!unindexed.length) { alert('All decks already indexed.'); return; }
+
+  const btn = document.getElementById('indexBtn');
+  const progressText = document.getElementById('indexProgressText');
+  btn.disabled = true;
+  progressText.classList.add('visible');
+
+  for (let i = 0; i < unindexed.length; i++) {
+    const entry = unindexed[i];
+    progressText.textContent = `Indexing ${i + 1} of ${unindexed.length}: ${entry.url.split('/').pop()}`;
+    try {
+      const flow = await callGemini([
+        { image_url: { url: entry.url } },
+        { text: 'Analyse this concept deck and return its flow as JSON.' }
+      ], FLOW_SYSTEM, 600);
+      entry.flow = parseJSON(flow);
     } catch(e) {
-      // Silently fail — inspiration section just stays disabled
-      console.warn('Could not load repository.csv:', e.message);
+      console.warn('Failed to index', entry.url, e.message);
     }
+    updateIndexStatus();
+    if (i < unindexed.length - 1) await new Promise(r => setTimeout(r, 600));
   }
 
-  loadCatalogue();
+  btn.disabled = false;
+  progressText.classList.remove('visible');
+  updateIndexStatus();
+}
 
-  // ── Inspiration matching ───────────────────────────────────────────────────
-  function pickInspiration(keywords) {
-    if (catalogue.length === 0) return null;
+// ── Download repository.json ──────────────────────────
+document.getElementById('downloadRepoBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(repository, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'repository.json';
+  a.click();
+});
 
-    const kws = keywords.toLowerCase().split(/[\s,]+/).filter(Boolean);
+// ═══════════════════════════════════════════════════════
+// FLOW MATCHING
+// ═══════════════════════════════════════════════════════
+function scoreMatch(a, b) {
+  if (!a || !b) return 0;
+  let score = 0;
 
-    // Score each deck by how many keywords match its tags
-    const scored = catalogue.map(deck => {
-      if (!kws.length) return { deck, score: 1 };
-      const score = kws.reduce((acc, kw) => {
-        return acc + deck.tags.filter(t => t.includes(kw) || kw.includes(t)).length;
-      }, 0);
-      return { deck, score };
-    });
+  // Hook type — high weight
+  if (a.hook_type && b.hook_type && a.hook_type === b.hook_type) score += 30;
 
-    const maxScore = Math.max(...scored.map(s => s.score));
-    const pool = maxScore > 0
-      ? scored.filter(s => s.score === maxScore)
-      : scored; // fallback: all decks
-
-    const matched = maxScore > 0;
-    // Avoid repeating last shown
-    const filtered = pool.filter(s => s.deck.url !== lastInspoUrl);
-    const chosen = filtered.length > 0 ? filtered : pool;
-    const pick = chosen[Math.floor(Math.random() * chosen.length)];
-    lastInspoUrl = pick.deck.url;
-    return { deck: pick.deck, matched, score: maxScore };
+  // Narrative arc — highest weight, partial credit per matching beat
+  if (Array.isArray(a.narrative_arc) && Array.isArray(b.narrative_arc)) {
+    const aArc = a.narrative_arc.map(s => s.toLowerCase());
+    const bArc = b.narrative_arc.map(s => s.toLowerCase());
+    const matches = aArc.filter(step => bArc.some(bs => bs.includes(step) || step.includes(bs)));
+    score += (matches.length / Math.max(aArc.length, bArc.length)) * 35;
+    // Bonus for same length
+    if (aArc.length === bArc.length) score += 5;
   }
 
-  // ── Inspiration flow ───────────────────────────────────────────────────────
-  const inspoResult      = document.getElementById('inspoResult');
-  const inspoBadgeWrap   = document.getElementById('inspoBadgeWrap');
-  const inspoHookImg     = document.getElementById('inspoHookImg');
-  const inspoCanvas      = document.getElementById('inspoCanvas');
-  const inspoAnalysis    = document.getElementById('inspoAnalysis');
-  const inspoPanelLabel  = document.getElementById('inspoPanelLabel');
-  const inspoKeywordsEl  = document.getElementById('inspoKeywords');
+  // Tone
+  if (a.tone && b.tone && a.tone === b.tone) score += 10;
 
-  inspoBtn.addEventListener('click', runInspiration);
-  inspoAgainBtn.addEventListener('click', runInspiration);
+  // Pacing
+  if (a.pacing && b.pacing && a.pacing === b.pacing) score += 8;
 
-  async function runInspiration() {
-    const apiKey = document.getElementById('apiKey').value.trim();
-    if (!apiKey) { showError('Please enter your Gemini API key above.'); return; }
-    if (catalogue.length === 0) { showError('Please import your repository CSV first.'); return; }
+  // Talent
+  if (typeof a.talent === 'boolean' && a.talent === b.talent) score += 6;
 
-    inspoBtn.disabled = true;
-    inspoAgainBtn.disabled = true;
-    inspoResult.classList.add('visible');
-    inspoAnalysis.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
-    inspoBadgeWrap.innerHTML = '';
+  // Product visible in hook
+  if (typeof a.product_visible_in_hook === 'boolean' && a.product_visible_in_hook === b.product_visible_in_hook) score += 6;
 
-    const keywords = inspoKeywordsEl.value.trim();
-    const pick = pickInspiration(keywords);
-    if (!pick) return;
+  return Math.round(score);
+}
 
-    const { deck, matched } = pick;
+function findMatches(uploadedFlow) {
+  const indexed = repository.filter(r => r.flow);
+  return indexed
+    .map(r => ({ ...r, score: scoreMatch(uploadedFlow, r.flow) }))
+    .sort((a, b) => b.score - a.score);
+}
 
-    // Tags on panel label
-    inspoPanelLabel.innerHTML = `Opening hook ${deck.tags.map(t =>
-      `<span class="tag">${t}</span>`).join('')}`;
+function renderFlow(el, flow) {
+  if (!flow) { el.innerHTML = '<p style="font-size:13px;color:var(--text-tertiary);">No flow data</p>'; return; }
+  el.innerHTML = `
+    <div class="flow-field">
+      <div class="flow-key">Hook type</div>
+      <div class="flow-val"><span class="flow-tag">${flow.hook_type || '—'}</span></div>
+    </div>
+    <div class="flow-field">
+      <div class="flow-key">Hook device</div>
+      <div class="flow-val">${flow.hook_device || '—'}</div>
+    </div>
+    <div class="flow-field">
+      <div class="flow-key">Narrative arc</div>
+      <div class="flow-arc">${(flow.narrative_arc || []).map((s, i, arr) =>
+        `<span class="arc-step">${s}</span>${i < arr.length - 1 ? '<span class="arc-arrow">→</span>' : ''}`
+      ).join('')}</div>
+    </div>
+    <div class="flow-field">
+      <div class="flow-key">Tone</div>
+      <div class="flow-val">${flow.tone || '—'}</div>
+    </div>
+    <div class="flow-field">
+      <div class="flow-key">Pacing · Frames · Caption style</div>
+      <div class="flow-val">${flow.pacing || '—'} · ${flow.frame_count || '—'} frames · ${flow.caption_style || '—'}</div>
+    </div>
+    <div class="flow-field">
+      <div class="flow-key">Talent · Product in hook</div>
+      <div class="flow-val">${flow.talent ? 'Yes' : 'No'} · ${flow.product_visible_in_hook ? 'Yes' : 'No'}</div>
+    </div>
+  `;
+}
 
-    // Match badge
-    if (keywords) {
-      const bc = matched ? 'matched' : 'fallback';
-      const bt = matched
-        ? `Matched on <strong>${keywords}</strong>`
-        : `No exact match — showing random deck`;
-      inspoBadgeWrap.innerHTML = `<div class="match-badge ${bc}"><span class="match-dot"></span><span>${bt}</span></div>`;
-    }
+function cropFirstFrame(img, canvas) {
+  const cropW = Math.floor(img.naturalWidth * 0.22);
+  canvas.width = cropW; canvas.height = img.naturalHeight;
+  canvas.getContext('2d').drawImage(img, 0, 0, cropW, img.naturalHeight, 0, 0, cropW, img.naturalHeight);
+}
 
-    // Load and crop image
-    const loaded = await new Promise(resolve => {
-      inspoHookImg.onload  = () => resolve(true);
-      inspoHookImg.onerror = () => resolve(false);
-      inspoHookImg.src = deck.url;
-    });
+// ── Flow matcher UI ───────────────────────────────────
+let uploadedDeckBase64 = null;
+let uploadedFlow = null;
+let rankedMatches = [];
+let currentMatchIndex = 0;
 
-    if (!loaded) {
-      inspoAnalysis.textContent = 'Could not load this image. Try another.';
-      inspoBtn.disabled = false;
-      inspoAgainBtn.disabled = false;
-      inspoAgainBtn.style.display = 'inline-block';
-      return;
-    }
+document.getElementById('deckInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    uploadedDeckBase64 = ev.target.result;
+    document.getElementById('deckZone').classList.add('has-file');
+    document.getElementById('deckLabel').textContent = file.name;
+    document.getElementById('deckChips').innerHTML = `<span class="file-chip">${file.name}</span>`;
+    const indexed = repository.filter(r => r.flow).length;
+    document.getElementById('matchBtn').disabled = indexed === 0;
+    hideErr(document.getElementById('matchError'));
+  };
+  reader.readAsDataURL(file);
+});
 
-    cropToCanvas(inspoHookImg, inspoCanvas);
+document.getElementById('matchBtn').addEventListener('click', runFlowMatch);
+document.getElementById('tryAnotherBtn').addEventListener('click', showNextMatch);
 
-    // Analyse with Gemini
-    try {
-      const SYSTEM = `You are a creative director at a video production company making short-form social content.
-A concept deck has a row of 9:16 frames with pink caption boxes above each. The FIRST frame is the opening hook.
-Describe only the opening hook in 2-3 sentences: (1) the visual/narrative device, (2) what makes it attention-grabbing, (3) what brand or product it suits. Be specific and insightful.`;
-      const text = await callGemini(apiKey, [
-        { image_url: { url: deck.url } },
-        { text: 'Describe the opening hook of this concept deck.' }
-      ], SYSTEM, 400);
-      inspoAnalysis.textContent = text || 'No analysis returned.';
-    } catch(err) {
-      inspoAnalysis.textContent = `Analysis unavailable: ${err.message}`;
-    }
+async function runFlowMatch() {
+  if (!getApiKey()) { showErr(document.getElementById('matchError'), 'Enter your Gemini API key first.'); return; }
+  if (!uploadedDeckBase64) { showErr(document.getElementById('matchError'), 'Upload a concept deck first.'); return; }
 
-    inspoBtn.disabled = false;
-    inspoAgainBtn.disabled = false;
-    inspoAgainBtn.style.display = 'inline-block';
+  hideErr(document.getElementById('matchError'));
+  document.getElementById('matchBtn').disabled = true;
+  document.getElementById('matchBtn').textContent = 'Analysing…';
+  document.getElementById('matchResult').classList.remove('visible');
+
+  const wrap = document.getElementById('matchProgress');
+  const fill = document.getElementById('matchProgressFill');
+  const label = document.getElementById('matchProgressLabel');
+
+  setProgress(wrap, fill, label, 30, 'Parsing your deck\'s narrative flow…');
+
+  try {
+    uploadedFlow = await parseDeckFlow(uploadedDeckBase64);
+    setProgress(wrap, fill, label, 70, 'Scoring against repository…');
+
+    rankedMatches = findMatches(uploadedFlow);
+    currentMatchIndex = 0;
+
+    renderFlow(document.getElementById('uploadedFlow'), uploadedFlow);
+    await showMatch(rankedMatches[0]);
+
+    document.getElementById('matchResult').classList.add('visible');
+    hideProgress(wrap);
+  } catch(err) {
+    hideProgress(wrap);
+    showErr(document.getElementById('matchError'),
+      err.message.includes('401') || err.message.includes('403')
+        ? 'Invalid API key.' : `Error: ${err.message}`);
   }
 
-  function cropToCanvas(img, canvas) {
-    const cropW = Math.floor(img.naturalWidth * 0.22);
-    canvas.width  = cropW;
-    canvas.height = img.naturalHeight;
-    canvas.getContext('2d').drawImage(img, 0, 0, cropW, img.naturalHeight, 0, 0, cropW, img.naturalHeight);
-  }
+  document.getElementById('matchBtn').disabled = false;
+  document.getElementById('matchBtn').textContent = 'Find matching deck';
+}
 
-  // ── Gemini helper ──────────────────────────────────────────────────────────
-  async function callGemini(apiKey, parts, systemPrompt, maxTokens = 1500) {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ role: 'user', parts }],
-          generationConfig: { maxOutputTokens: maxTokens }
-        })
-      }
-    );
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(`Gemini ${res.status}: ${err?.error?.message || 'Unknown error'}`);
-    }
-    const data = await res.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-  }
+async function showMatch(match) {
+  if (!match) return;
+  renderFlow(document.getElementById('matchedFlow'), match.flow);
+  document.getElementById('matchScoreLabel').textContent = `${match.score}% match`;
 
-  // ── Video upload ───────────────────────────────────────────────────────────
-  const videoInput  = document.getElementById('videoInput');
-  const videoLabel  = document.getElementById('videoLabel');
-  const videoChips  = document.getElementById('videoChips');
-  const generateBtn = document.getElementById('generateBtn');
-  const errorMsg    = document.getElementById('errorMsg');
+  const img = document.getElementById('matchedHookImg');
+  const canvas = document.getElementById('matchedCanvas');
 
-  let videoFiles = [];
-
-  videoInput.addEventListener('change', e => {
-    videoFiles = Array.from(e.target.files).filter(f => f.type.startsWith('video/'));
-    if (!videoFiles.length) return;
-    document.getElementById('videoZone').classList.add('has-files');
-    videoLabel.textContent = `${videoFiles.length} video${videoFiles.length > 1 ? 's' : ''} selected`;
-    videoChips.innerHTML = videoFiles.map(f => `<span class="file-chip">${f.name}</span>`).join('');
-    generateBtn.disabled = false;
-    errorMsg.style.display = 'none';
+  await new Promise(resolve => {
+    img.onload = () => { cropFirstFrame(img, canvas); resolve(); };
+    img.onerror = () => { canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height); resolve(); };
+    img.src = match.url;
   });
+}
 
-  // ── Progress ───────────────────────────────────────────────────────────────
-  const progressWrap  = document.getElementById('progressWrap');
-  const progressLabel = document.getElementById('progressLabel');
-  const progressFill  = document.getElementById('progressFill');
+async function showNextMatch() {
+  currentMatchIndex = (currentMatchIndex + 1) % rankedMatches.length;
+  await showMatch(rankedMatches[currentMatchIndex]);
+}
 
-  function setProgress(pct, label) {
-    progressWrap.classList.add('visible');
-    progressLabel.textContent = label;
-    progressFill.style.width = pct + '%';
-  }
-  function hideProgress() {
-    progressWrap.classList.remove('visible');
-    progressFill.style.width = '0%';
-  }
-  function showError(msg) {
-    errorMsg.textContent = msg;
-    errorMsg.style.display = 'block';
-  }
-
-  // ── Frame extraction ───────────────────────────────────────────────────────
-  function extractFrames(file, intervalSecs = 2) {
-    return new Promise((resolve, reject) => {
-      const video = document.createElement('video');
-      video.muted = true; video.playsInline = true;
-      const url = URL.createObjectURL(file);
-      video.src = url;
-      video.addEventListener('loadedmetadata', () => {
-        const duration = Math.min(video.duration, 90);
-        const times = [];
-        for (let t = 0.5; t < duration; t += intervalSecs) times.push(+t.toFixed(2));
-        const frames = [];
-        let i = 0;
-        function seekNext() {
-          if (i >= times.length) { URL.revokeObjectURL(url); resolve(frames); return; }
-          video.currentTime = times[i];
-        }
-        video.addEventListener('seeked', () => {
-          const canvas = document.createElement('canvas');
-          const maxW = 640;
-          const scale = Math.min(1, maxW / video.videoWidth);
-          canvas.width  = Math.round(video.videoWidth  * scale);
-          canvas.height = Math.round(video.videoHeight * scale);
-          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-          frames.push({ canvas, time: times[i], fileName: file.name });
-          i++; seekNext();
-        });
-        video.addEventListener('error', reject);
-        seekNext();
-      });
-      video.load();
-    });
-  }
-
-  // ── Pixel-diff cull ────────────────────────────────────────────────────────
-  function cullFrames(frames, targetCount = 12) {
-    if (frames.length <= targetCount) return frames;
-    function frameHash(canvas) {
-      const tmp = document.createElement('canvas');
-      tmp.width = 8; tmp.height = 8;
-      tmp.getContext('2d').drawImage(canvas, 0, 0, 8, 8);
-      return tmp.getContext('2d').getImageData(0, 0, 8, 8).data;
-    }
-    function diff(a, b) {
-      let d = 0;
-      for (let i = 0; i < a.length; i += 4) d += Math.abs(a[i] - b[i]);
-      return d / (a.length / 4);
-    }
-    const hashes = frames.map(f => frameHash(f.canvas));
-    const kept = [0];
-    for (let i = 1; i < frames.length; i++) {
-      const minDiff = Math.min(...kept.map(k => diff(hashes[i], hashes[k])));
-      if (minDiff > 8) kept.push(i);
-    }
-    if (kept.length <= targetCount) return kept.map(i => frames[i]);
-    const step = kept.length / targetCount;
-    return Array.from({ length: targetCount }, (_, n) => frames[kept[Math.floor(n * step)]]);
-  }
-
-  // ── Select hooks via Gemini ────────────────────────────────────────────────
-  async function selectHooks(apiKey, frames, keywords) {
-    const frameList = frames.map((f, i) => `Frame ${i} — ${f.fileName} at ${f.time}s`).join('\n');
-    const systemPrompt = `You are a creative director at a short-form video production company.
-Identify 3-5 frames that would make the strongest opening hooks for a social media video.
-For each, write a short punchy caption: second person or provocative, max 8 words, tease don't explain.
-Examples: "Frozen in time… but your ice cream isn't", "When did getting ready become this easy?"
-Return ONLY a JSON array, no markdown. Each item: { "frameIndex": <n>, "caption": "<text>", "reason": "<one sentence>" }`;
-    const imgParts = frames.map(f => ({
-      inline_data: { mime_type: 'image/jpeg', data: f.canvas.toDataURL('image/jpeg', 0.8).split(',')[1] }
-    }));
-    const textPart = { text: `Keywords: ${keywords || 'none'}\n\nFrames:\n${frameList}\n\nSelect 3-5 strongest hook frames with captions.` };
-    const raw = await callGemini(apiKey, [...imgParts, textPart], systemPrompt, 1500);
-    const clean = raw.replace(/```json|```/g, '').trim();
-    return JSON.parse(clean);
-  }
-
-  // ── Render hook card ───────────────────────────────────────────────────────
-  function renderHookCard(hook, frame) {
-    const card = document.createElement('div');
-    card.className = 'hook-card';
-
-    const caption = document.createElement('div');
-    caption.className = 'hook-caption';
-    caption.textContent = hook.caption;
-
-    const frameWrap = document.createElement('div');
-    frameWrap.className = 'hook-frame-wrap';
-
-    const outCanvas = document.createElement('canvas');
-    const srcW = frame.canvas.width, srcH = frame.canvas.height;
-    const targetAR = 9 / 16, srcAR = srcW / srcH;
-    let cropW, cropH, cropX, cropY;
-    if (srcAR > targetAR) {
-      cropH = srcH; cropW = Math.round(srcH * targetAR);
-      cropX = Math.round((srcW - cropW) / 2); cropY = 0;
-    } else {
-      cropW = srcW; cropH = Math.round(srcW / targetAR);
-      cropX = 0; cropY = Math.round((srcH - cropH) / 2);
-    }
-    outCanvas.width = cropW; outCanvas.height = cropH;
-    outCanvas.getContext('2d').drawImage(frame.canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
-    frameWrap.appendChild(outCanvas);
-
-    const ts = document.createElement('span');
-    ts.className = 'hook-timestamp';
-    ts.textContent = `${frame.time.toFixed(1)}s`;
-    frameWrap.appendChild(ts);
-
-    const footer = document.createElement('div');
-    footer.className = 'hook-card-footer';
-    const reasonSpan = document.createElement('span');
-    reasonSpan.textContent = hook.reason;
-    reasonSpan.title = hook.reason;
-
-    const dlBtn = document.createElement('a');
-    dlBtn.className = 'dl-btn';
-    dlBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save`;
-    dlBtn.addEventListener('click', e => {
-      e.preventDefault();
-      const exp = document.createElement('canvas');
-      const capH = Math.round(outCanvas.width * 0.18);
-      exp.width = outCanvas.width; exp.height = outCanvas.height + capH;
-      const ctx = exp.getContext('2d');
-      ctx.fillStyle = '#f2c4ce';
-      ctx.fillRect(0, 0, exp.width, capH);
-      ctx.fillStyle = '#5a1a26';
-      let fs = Math.round(capH * 0.32);
-      ctx.font = `italic ${fs}px 'DM Serif Display', Georgia, serif`;
-      ctx.textBaseline = 'middle';
-      const maxW = exp.width - 24;
-      while (ctx.measureText(hook.caption).width > maxW && fs > 10) {
-        fs--; ctx.font = `italic ${fs}px 'DM Serif Display', Georgia, serif`;
-      }
-      ctx.fillText(hook.caption, 12, capH / 2);
-      ctx.drawImage(outCanvas, 0, capH);
-      const a = document.createElement('a');
-      a.href = exp.toDataURL('image/png');
-      a.download = `hook-${frame.time.toFixed(1)}s.png`;
-      a.click();
-    });
-
-    footer.appendChild(reasonSpan);
-    footer.appendChild(dlBtn);
-    card.appendChild(caption);
-    card.appendChild(frameWrap);
-    card.appendChild(footer);
-    return card;
-  }
-
-  // ── Main generate flow ─────────────────────────────────────────────────────
-  generateBtn.addEventListener('click', async () => {
-    const apiKey = document.getElementById('apiKey').value.trim();
-    if (!apiKey) { showError('Please enter your Gemini API key.'); return; }
-    if (!videoFiles.length) { showError('Please upload at least one video.'); return; }
-
-    errorMsg.style.display = 'none';
-    generateBtn.disabled = true;
-    generateBtn.textContent = 'Generating…';
-
-    const resultsEl = document.getElementById('results');
-    const gallery   = document.getElementById('hookGallery');
-    resultsEl.classList.remove('visible');
-    gallery.innerHTML = '';
-
-    try {
-      let allFrames = [];
-      for (let i = 0; i < videoFiles.length; i++) {
-        setProgress(Math.round((i / videoFiles.length) * 40), `Extracting frames from ${videoFiles[i].name}…`);
-        const frames = await extractFrames(videoFiles[i], 2);
-        allFrames = allFrames.concat(frames);
-      }
-      setProgress(45, `Culling ${allFrames.length} frames to most distinct…`);
-      const culled = cullFrames(allFrames, 12);
-      setProgress(55, `Sending ${culled.length} frames to Gemini…`);
-      const keywords = document.getElementById('keywords').value.trim();
-      const hooks = await selectHooks(apiKey, culled, keywords);
-      setProgress(95, 'Rendering hook candidates…');
-      document.getElementById('resultsTitle').textContent = `${hooks.length} hook candidate${hooks.length !== 1 ? 's' : ''}`;
-      document.getElementById('resultsSubtitle').textContent = `from ${allFrames.length} frames across ${videoFiles.length} video${videoFiles.length > 1 ? 's' : ''}`;
-      hooks.forEach(hook => {
-        const frame = culled[hook.frameIndex];
-        if (frame) gallery.appendChild(renderHookCard(hook, frame));
-      });
-      resultsEl.classList.add('visible');
-      hideProgress();
-    } catch(err) {
-      hideProgress();
-      showError(err.message.includes('401') || err.message.includes('403')
-        ? 'Invalid API key or access denied.'
-        : `Error: ${err.message}`);
-      console.error(err);
-    }
-
-    generateBtn.disabled = false;
-    generateBtn.textContent = 'Generate hook ideas';
-  });
+// ── Init ──────────────────────────────────────────────
+loadRepository();
 </script>
 </body>
 </html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Hook Extractor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;1,400&family=DM+Serif+Display:ital@1&display=swap" rel="stylesheet">
+  <style>
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff; --bg-secondary: #f7f6f3; --bg-tertiary: #f0ede8;
+      --text-primary: #1a1a18; --text-secondary: #5f5e5a; --text-tertiary: #9a9892;
+      --border: rgba(0,0,0,0.1); --border-mid: rgba(0,0,0,0.18);
+      --radius-md: 8px; --radius-lg: 12px;
+      --pink: #f2c4ce; --pink-dark: #e8637a; --pink-text: #5a1a26;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a; --bg-secondary: #242422; --bg-tertiary: #2c2c2a;
+        --text-primary: #f0ede8; --text-secondary: #b4b2a9; --text-tertiary: #6e6c68;
+        --border: rgba(255,255,255,0.09); --border-mid: rgba(255,255,255,0.16);
+      }
+    }
+    html, body { min-height: 100vh; background: var(--bg-tertiary); font-family: 'DM Sans', system-ui, sans-serif; color: var(--text-primary); }
+    .page { max-width: 920px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+    /* Header */
+    .header { margin-bottom: 2.5rem; }
+    .header h1 { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 32px; font-weight: 400; letter-spacing: -0.01em; }
+    .header p { font-size: 14px; color: var(--text-tertiary); margin-top: 4px; }
+
+    /* Section headers */
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; }
+    .section-header h2 { font-size: 17px; font-weight: 500; letter-spacing: -0.02em; }
+    .section-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; background: var(--pink); color: var(--pink-text); }
+
+    /* Cards */
+    .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+    .card-label { font-size: 11px; font-weight: 500; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+
+    /* Inputs */
+    .text-input { width: 100%; padding: 9px 12px; font-family: inherit; font-size: 14px; background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); outline: none; }
+    .text-input:focus { border-color: var(--border-mid); }
+    textarea.text-input { resize: none; line-height: 1.5; }
+    .input-hint { font-size: 12px; color: var(--text-tertiary); margin-top: 6px; }
+    .input-hint a { color: var(--pink-dark); text-decoration: none; }
+
+    /* Upload zone */
+    .upload-zone { border: 1.5px dashed var(--border-mid); border-radius: var(--radius-lg); padding: 1.75rem 1.5rem; text-align: center; cursor: pointer; position: relative; background: var(--bg); transition: border-color 0.2s; margin-bottom: 1rem; }
+    .upload-zone:hover { border-color: var(--text-tertiary); }
+    .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-zone svg { margin: 0 auto 8px; display: block; color: var(--text-tertiary); }
+    .upload-zone p { font-size: 13px; color: var(--text-secondary); }
+    .upload-zone span { font-size: 11px; color: var(--text-tertiary); display: block; margin-top: 3px; }
+    .upload-zone.has-file { border-style: solid; border-color: var(--border); padding: 1rem 1.5rem; }
+    .upload-zone.has-file svg { display: none; }
+    .upload-zone.has-file .hint { display: none; }
+    .file-chips { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 8px; }
+    .file-chip { font-size: 11px; padding: 2px 9px; background: var(--bg-secondary); border-radius: 20px; color: var(--text-secondary); border: 0.5px solid var(--border); }
+
+    /* Buttons */
+    .btn {
+      padding: 11px 20px; font-family: inherit; font-size: 14px; font-weight: 500;
+      border: 0.5px solid var(--border-mid); border-radius: var(--radius-md);
+      background: var(--bg); color: var(--text-primary); cursor: pointer;
+      transition: background 0.15s, opacity 0.15s; white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) { background: var(--bg-secondary); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-primary { background: var(--text-primary); color: var(--bg); border-color: var(--text-primary); }
+    .btn-primary:hover:not(:disabled) { opacity: 0.85; background: var(--text-primary); }
+    .btn-accent { background: var(--pink-dark); color: white; border-color: var(--pink-dark); }
+    .btn-accent:hover:not(:disabled) { opacity: 0.88; background: var(--pink-dark); }
+    .btn-full { width: 100%; margin-bottom: 0.5rem; padding: 14px; font-size: 15px; letter-spacing: -0.01em; }
+
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
+
+    .error-msg { font-size: 13px; color: #c0392b; text-align: center; display: none; margin-top: 6px; }
+
+    /* Progress */
+    .progress-wrap { display: none; margin: 1.5rem 0; background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
+    .progress-wrap.visible { display: block; }
+    .progress-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+    .progress-bar-track { height: 3px; background: var(--bg-tertiary); border-radius: 2px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--pink-dark); border-radius: 2px; width: 0%; transition: width 0.3s ease; }
+
+    /* Two-panel result */
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+    @media (max-width: 600px) { .result-grid { grid-template-columns: 1fr; } }
+
+    .result-panel { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .result-panel-header { padding: 10px 14px; font-size: 11px; font-weight: 500; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 0.5px solid var(--border); background: var(--bg-secondary); display: flex; align-items: center; justify-content: space-between; }
+    .result-panel canvas, .result-panel img { width: 100%; display: block; }
+
+    /* Flow cards */
+    .flow-card { padding: 1.25rem 1.5rem; }
+    .flow-field { margin-bottom: 12px; }
+    .flow-field:last-child { margin-bottom: 0; }
+    .flow-key { font-size: 10px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+    .flow-val { font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+    .flow-arc { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .arc-step { font-size: 12px; padding: 3px 10px; background: var(--bg-secondary); border-radius: 20px; color: var(--text-secondary); border: 0.5px solid var(--border); }
+    .arc-arrow { color: var(--text-tertiary); font-size: 12px; }
+    .flow-tag { display: inline-block; font-size: 11px; padding: 2px 8px; background: var(--pink); color: var(--pink-text); border-radius: 4px; margin-right: 4px; }
+    @media (prefers-color-scheme: dark) { .flow-tag { background: #3a1520; color: #f08098; } }
+
+    /* Match score badge */
+    .match-score { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: #edf7ed; color: #2d7a2d; }
+    @media (prefers-color-scheme: dark) { .match-score { background: #1a3a1a; color: #7ecf7e; } }
+
+    /* Index panel */
+    .index-panel { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+    .index-status { font-size: 13px; color: var(--text-secondary); }
+    .index-status strong { color: var(--text-primary); }
+    .index-progress-text { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; display: none; }
+    .index-progress-text.visible { display: block; }
+
+    /* Divider */
+    .divider { border: none; border-top: 0.5px solid var(--border); margin: 3rem 0 2.5rem; }
+
+    /* Results hidden */
+    .result-section { display: none; }
+    .result-section.visible { display: block; }
+
+    /* Video gallery */
+    .hook-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    @media (max-width: 600px) { .hook-gallery { grid-template-columns: repeat(2, 1fr); } }
+    .hook-card { background: var(--bg); border: 2px solid transparent; border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: border-color 0.15s, transform 0.1s; }
+    .hook-card:hover { border-color: var(--border-mid); transform: scale(1.01); }
+    .hook-card.selected { border-color: var(--pink-dark); }
+    .hook-frame-wrap { position: relative; background: #111; aspect-ratio: 9/16; overflow: hidden; }
+    .hook-frame-wrap canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hook-timestamp { position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.55); color: white; font-size: 10px; padding: 2px 5px; border-radius: 4px; }
+    .hook-select-badge { position: absolute; top: 6px; left: 6px; background: var(--pink-dark); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; display: none; }
+    .hook-card.selected .hook-select-badge { display: block; }
+    .hook-rec-badge { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.5); color: #ffd700; font-size: 12px; padding: 2px 5px; border-radius: 4px; }
+    .hook-card-label { padding: 6px 8px; font-size: 11px; color: var(--text-tertiary); border-top: 0.5px solid var(--border); text-align: center; }
+    .hook-card.selected .hook-card-label { color: var(--pink-dark); font-weight: 500; }
+
+    /* Merge panel */
+    .merge-panel { display: none; }
+    .merge-panel.visible { display: block; margin-top: 1.5rem; }
+    .caption-row { display: flex; gap: 10px; align-items: flex-start; }
+    .caption-row .text-input { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 15px; }
+    .merge-result { display: none; margin-top: 1.5rem; }
+    .merge-result.visible { display: block; }
+
+    /* Loading dots */
+    .loading-dots { display: inline-flex; gap: 4px; align-items: center; }
+    .loading-dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--text-tertiary); animation: db 1.2s ease-in-out infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes db { 0%,80%,100% { transform: scale(0.6); opacity: 0.3; } 40% { transform: scale(1); opacity: 1; } }
+  
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>Video Hook Extractor</h1>
+    <p>Upload a video — extract the strongest opening hook frames.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Gemini API key</div>
+    <input type="password" class="text-input" id="apiKey" placeholder="AIza..." autocomplete="off">
+    <p class="input-hint">Entered each session — never stored. Get one at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+    <div class="upload-zone" id="videoZone">
+      <input type="file" accept="video/*" multiple id="videoInput">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="5" width="20" height="14" rx="2"/>
+        <path d="M10 9l5 3-5 3V9z"/>
+      </svg>
+      <p id="videoLabel">Upload video files</p>
+      <span class="hint">MP4, MOV, WEBM — under 60s</span>
+      <div class="file-chips" id="videoChips"></div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-label">Keywords / objectives</div>
+      <textarea class="text-input" id="keywords" rows="4" placeholder="e.g. zero sugar, summer feeling, Gen Z, product reveal"></textarea>
+    </div>
+  </div>
+
+  <button class="btn btn-primary btn-full" id="generateBtn" disabled>Analyse video</button>
+  <p class="error-msg" id="videoError"></p>
+
+  <div class="progress-wrap" id="videoProgress">
+    <div class="progress-label" id="videoProgressLabel">Extracting frames…</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="videoProgressFill"></div></div>
+  </div>
+
+  <div class="result-section" id="videoResults">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1rem;">
+      <h3 style="font-size:15px;font-weight:500;">Select your opening frame</h3>
+      <span style="font-size:12px;color:var(--text-tertiary);" id="videoResultsSub"></span>
+    </div>
+    <div class="hook-gallery" id="hookGallery"></div>
+  </div>
+
+  <div class="merge-panel card" id="mergePanel">
+    <div class="card-label">Write caption &amp; merge into deck</div>
+    <div class="upload-zone" id="mergeDeckZone" style="margin-bottom:1rem;">
+      <input type="file" accept="image/*" id="mergeDeckInput">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M3 9h18M9 21V9"/>
+      </svg>
+      <p id="mergeDeckLabel">Upload concept deck to merge into</p>
+      <span class="hint">PNG, JPG, WEBP</span>
+      <div class="file-chips" id="mergeDeckChips"></div>
+    </div>
+    <div class="caption-row" style="margin-bottom:0.5rem;">
+      <input type="text" class="text-input" id="captionInput" placeholder="e.g. Frozen in time… but your ice cream isn't" maxlength="80">
+      <button class="btn btn-accent" id="mergeBtn" style="flex-shrink:0;">Merge</button>
+    </div>
+    <p class="input-hint">Max 8 words — tease, don't explain</p>
+    <div class="merge-result" id="mergeResult">
+      <div class="result-panel" style="margin-top:1.25rem;">
+        <div class="result-panel-header">
+          <span>Merged deck</span>
+          <span id="mergedFrameLabel" style="font-size:11px;color:var(--text-tertiary);"></span>
+        </div>
+        <canvas id="mergeCanvas" style="width:100%;display:block;"></canvas>
+      </div>
+      <div class="btn-row" style="margin-top:1rem;">
+        <a class="btn" id="downloadMergeBtn" download="merged-deck.png">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download merged deck
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+function getApiKey() { return document.getElementById('apiKey').value.trim(); }
+
+function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+function hideErr(el) { el.style.display = 'none'; }
+
+function setProgress(wrapEl, fillEl, labelEl, pct, label) {
+  wrapEl.classList.add('visible');
+  if (labelEl) labelEl.textContent = label;
+  fillEl.style.width = pct + '%';
+}
+function hideProgress(wrapEl) { wrapEl.classList.remove('visible'); }
+
+async function callGemini(parts, systemPrompt, maxTokens = 1000) {
+  const key = getApiKey();
+  if (!key) throw new Error('No API key');
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts }],
+        generationConfig: { maxOutputTokens: maxTokens }
+      })
+    }
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Gemini ${res.status}: ${err?.error?.message || 'Unknown'}`);
+  }
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+}
+
+function parseJSON(raw) { return JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+
+// ═══════════════════════════════════════════════════════
+// VIDEO HOOK EXTRACTOR
+// ═══════════════════════════════════════════════════════
+let videoFiles = [];
+let allFrames = [];
+let selectedFrame = null;
+let mergedDeckBase64 = null;
+
+// Video upload
+document.getElementById('videoInput').addEventListener('change', e => {
+  videoFiles = Array.from(e.target.files).filter(f => f.type.startsWith('video/'));
+  if (!videoFiles.length) return;
+  document.getElementById('videoZone').classList.add('has-file');
+  document.getElementById('videoLabel').textContent = `${videoFiles.length} video${videoFiles.length > 1 ? 's' : ''} selected`;
+  document.getElementById('videoChips').innerHTML = videoFiles.map(f => `<span class="file-chip">${f.name}</span>`).join('');
+  document.getElementById('generateBtn').disabled = false;
+});
+
+// Merge deck upload
+document.getElementById('mergeDeckInput').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    mergedDeckBase64 = ev.target.result;
+    document.getElementById('mergeDeckZone').classList.add('has-file');
+    document.getElementById('mergeDeckLabel').textContent = file.name;
+    document.getElementById('mergeDeckChips').innerHTML = `<span class="file-chip">${file.name}</span>`;
+  };
+  reader.readAsDataURL(file);
+});
+
+function extractFrames(file) {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.muted = true; video.playsInline = true;
+    const url = URL.createObjectURL(file);
+    video.src = url;
+    video.addEventListener('loadedmetadata', () => {
+      const times = Array.from({ length: 8 }, (_, i) => +((i / 8) * video.duration).toFixed(2));
+      const frames = []; let i = 0;
+      function seekNext() { if (i >= times.length) { URL.revokeObjectURL(url); resolve(frames); return; } video.currentTime = times[i]; }
+      video.addEventListener('seeked', () => {
+        const c = document.createElement('canvas');
+        const scale = Math.min(1, 640 / video.videoWidth);
+        c.width = Math.round(video.videoWidth * scale); c.height = Math.round(video.videoHeight * scale);
+        c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+        frames.push({ canvas: c, time: times[i], fileName: file.name });
+        i++; seekNext();
+      });
+      video.addEventListener('error', reject);
+      seekNext();
+    });
+    video.load();
+  });
+}
+
+function cropTo916(src) {
+  const srcW = src.width, srcH = src.height, ar = 9/16, sar = srcW/srcH;
+  let cw, ch, cx, cy;
+  if (sar > ar) { ch = srcH; cw = Math.round(srcH*ar); cx = Math.round((srcW-cw)/2); cy = 0; }
+  else { cw = srcW; ch = Math.round(srcW/ar); cx = 0; cy = Math.round((srcH-ch)/2); }
+  const out = document.createElement('canvas');
+  out.width = cw; out.height = ch;
+  out.getContext('2d').drawImage(src, cx, cy, cw, ch, 0, 0, cw, ch);
+  return out;
+}
+
+document.getElementById('generateBtn').addEventListener('click', async () => {
+  if (!getApiKey()) { showErr(document.getElementById('videoError'), 'Enter your Gemini API key first.'); return; }
+  if (!videoFiles.length) return;
+
+  hideErr(document.getElementById('videoError'));
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true; btn.textContent = 'Analysing…';
+  document.getElementById('videoResults').classList.remove('visible');
+  document.getElementById('hookGallery').innerHTML = '';
+  document.getElementById('mergePanel').classList.remove('visible');
+  selectedFrame = null;
+
+  const wrap = document.getElementById('videoProgress');
+  const fill = document.getElementById('videoProgressFill');
+  const label = document.getElementById('videoProgressLabel');
+
+  try {
+    allFrames = [];
+    for (let i = 0; i < videoFiles.length; i++) {
+      setProgress(wrap, fill, label, Math.round((i/videoFiles.length)*50), `Extracting frames from ${videoFiles[i].name}…`);
+      allFrames = allFrames.concat(await extractFrames(videoFiles[i]));
+    }
+
+    setProgress(wrap, fill, label, 65, `Sending ${allFrames.length} frames to Gemini…`);
+    const keywords = document.getElementById('keywords').value.trim();
+    const frameList = allFrames.map((f, i) => `Frame ${i} at ${f.time.toFixed(1)}s from ${f.fileName}`).join('\n');
+    const imgParts = allFrames.map(f => ({ inline_data: { mime_type: 'image/jpeg', data: f.canvas.toDataURL('image/jpeg', 0.8).split(',')[1] } }));
+    const raw = await callGemini(
+      [...imgParts, { text: `Keywords: ${keywords || 'none'}\nFrames:\n${frameList}\nIdentify 3-5 strongest hook frames.` }],
+      `You are a creative director. Identify 3-5 frames that make the strongest opening hooks for a social video. Return ONLY a JSON array: [{"frameIndex":<n>,"reason":"<one sentence>"}]`,
+      800
+    );
+    const recommended = parseJSON(raw);
+    const recSet = new Set(recommended.map(r => r.frameIndex));
+    const reasonMap = Object.fromEntries(recommended.map(r => [r.frameIndex, r.reason]));
+
+    setProgress(wrap, fill, label, 90, 'Rendering frames…');
+    const gallery = document.getElementById('hookGallery');
+    allFrames.forEach((frame, idx) => {
+      const cropped = cropTo916(frame.canvas);
+      const card = document.createElement('div'); card.className = 'hook-card';
+      const fw = document.createElement('div'); fw.className = 'hook-frame-wrap';
+      fw.appendChild(cropped);
+      const ts = document.createElement('span'); ts.className = 'hook-timestamp'; ts.textContent = `${frame.time.toFixed(1)}s`; fw.appendChild(ts);
+      const sb = document.createElement('span'); sb.className = 'hook-select-badge'; sb.textContent = 'Selected'; fw.appendChild(sb);
+      if (recSet.has(idx)) { const rb = document.createElement('span'); rb.className = 'hook-rec-badge'; rb.textContent = '★'; rb.title = reasonMap[idx] || ''; fw.appendChild(rb); }
+      const lbl = document.createElement('div'); lbl.className = 'hook-card-label'; lbl.textContent = recSet.has(idx) ? '★ Recommended' : `Frame ${idx+1}`;
+      card.appendChild(fw); card.appendChild(lbl);
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.hook-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedFrame = { frame, croppedCanvas: cropped, idx };
+        document.getElementById('mergePanel').classList.add('visible');
+        document.getElementById('mergePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      gallery.appendChild(card);
+    });
+
+    document.getElementById('videoResultsSub').textContent = `${allFrames.length} frames · ★ = Gemini recommended`;
+    document.getElementById('videoResults').classList.add('visible');
+    hideProgress(wrap);
+  } catch(err) {
+    hideProgress(wrap);
+    showErr(document.getElementById('videoError'), err.message.includes('401') ? 'Invalid API key.' : `Error: ${err.message}`);
+  }
+  btn.disabled = false; btn.textContent = 'Analyse video';
+});
+
+// ── Merge ─────────────────────────────────────────────
+function detectPinkBarHeight(img) {
+  const tmp = document.createElement('canvas');
+  tmp.width = img.naturalWidth; tmp.height = img.naturalHeight;
+  tmp.getContext('2d').drawImage(img, 0, 0);
+  const data = tmp.getContext('2d').getImageData(Math.floor(img.naturalWidth * 0.11), 0, 1, img.naturalHeight).data;
+  function isPink(r, g, b) { return r > 200 && g > 120 && g < 230 && b > 130 && b < 240 && r > b && r > g; }
+  let lastPink = 0;
+  for (let y = 0; y < img.naturalHeight; y++) {
+    const i = y * 4;
+    if (isPink(data[i], data[i+1], data[i+2])) lastPink = y;
+    else if (lastPink > 10 && y > lastPink + 5) break;
+  }
+  return lastPink + 1;
+}
+
+document.getElementById('mergeBtn').addEventListener('click', () => {
+  if (!selectedFrame || !mergedDeckBase64) { alert('Upload a concept deck to merge into.'); return; }
+  const caption = document.getElementById('captionInput').value.trim();
+  if (!caption) { document.getElementById('captionInput').focus(); return; }
+  const btn = document.getElementById('mergeBtn');
+  btn.disabled = true; btn.textContent = 'Merging…';
+  const base = new Image();
+  base.onload = () => {
+    const W = base.naturalWidth, H = base.naturalHeight;
+    const hookW = Math.floor(W * 0.22);
+    const pinkH = detectPinkBarHeight(base);
+    const mc = document.getElementById('mergeCanvas');
+    mc.width = W; mc.height = H;
+    const ctx = mc.getContext('2d');
+    ctx.drawImage(base, 0, 0);
+    ctx.fillStyle = '#f2c4ce'; ctx.fillRect(0, 0, hookW, pinkH);
+    ctx.fillStyle = '#5a1a26';
+    let fs = Math.round(pinkH * 0.28);
+    ctx.font = `italic ${fs}px 'DM Serif Display', Georgia, serif`;
+    ctx.textBaseline = 'middle';
+    while (ctx.measureText(caption).width > hookW - 20 && fs > 9) { fs--; ctx.font = `italic ${fs}px 'DM Serif Display', Georgia, serif`; }
+    ctx.fillText(caption, 10, pinkH / 2);
+    ctx.drawImage(selectedFrame.croppedCanvas, 0, pinkH, hookW, H - pinkH);
+    const dlBtn = document.getElementById('downloadMergeBtn');
+    dlBtn.href = mc.toDataURL('image/png');
+    document.getElementById('mergedFrameLabel').textContent = `Frame at ${selectedFrame.frame.time.toFixed(1)}s`;
+    document.getElementById('mergeResult').classList.add('visible');
+    document.getElementById('mergeResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    btn.disabled = false; btn.textContent = 'Merge';
+  };
+  base.src = mergedDeckBase64;
+});
+
+document.getElementById('downloadMergeBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  const a = document.createElement('a');
+  a.href = document.getElementById('mergeCanvas').toDataURL('image/png');
+  a.download = 'merged-deck.png'; a.click();
+});
+</script>
+</body>
+</html>
