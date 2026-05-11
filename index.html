@@ -241,6 +241,21 @@ const apiKeyEl = document.getElementById('apiKey');
 
 function getApiKey() { return apiKeyEl.value.trim(); }
 
+async function fetchImageAsBase64(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Could not fetch image: ${res.status}`);
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve({
+      mime_type: blob.type || 'image/png',
+      data: reader.result.split(',')[1]
+    });
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 async function callGemini(parts, systemPrompt, maxTokens = 1000) {
   const key = getApiKey();
   if (!key) throw new Error('No API key');
@@ -396,8 +411,9 @@ async function runIndexing() {
     progressText.textContent = `Indexing ${i + 1} of ${unindexed.length}: ${filename}…`;
 
     try {
+      const imgData = await fetchImageAsBase64(entry.url);
       const raw = await callGemini([
-        { image_url: { url: entry.url } },
+        { inline_data: imgData },
         { text: 'Analyse this concept deck and return its flow as JSON.' }
       ], FLOW_SYSTEM, 600);
 
