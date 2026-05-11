@@ -183,6 +183,7 @@
 
   <button class="btn btn-primary btn-full" id="matchBtn" disabled>Find matching deck</button>
   <p class="error-msg" id="matchError"></p>
+  <p id="matchHint" style="font-size:12px;color:#c08000;text-align:center;margin-top:6px;display:none;">Repository not yet indexed — open Repository management below and click Index new decks first.</p>
 
   <div class="progress-wrap" id="matchProgress">
     <div class="progress-label" id="matchProgressLabel">Analysing deck flow…</div>
@@ -344,7 +345,15 @@ function updateIndexStatus() {
   } else {
     el.innerHTML = `<strong>All ${total} decks indexed</strong> and ready to match.`;
   }
-  document.getElementById('matchBtn').disabled = indexed === 0;
+  checkMatchReady();
+}
+
+function checkMatchReady() {
+  const hasDeck = !!uploadedDeckBase64;
+  const hasIndexed = repository.filter(r => r.flow).length > 0;
+  document.getElementById('matchBtn').disabled = !(hasDeck && hasIndexed);
+  const hint = document.getElementById('matchHint');
+  if (hint) hint.style.display = (hasDeck && !hasIndexed) ? 'block' : 'none';
 }
 
 // CSV URL parsing (fallback)
@@ -378,25 +387,50 @@ async function runIndexing() {
   btn.disabled = true;
   progressText.classList.add('visible');
 
+  let successCount = 0;
+  let failCount = 0;
+
   for (let i = 0; i < unindexed.length; i++) {
     const entry = unindexed[i];
-    progressText.textContent = `Indexing ${i + 1} of ${unindexed.length}: ${entry.url.split('/').pop()}`;
+    const filename = entry.url.split('/').pop();
+    progressText.textContent = `Indexing ${i + 1} of ${unindexed.length}: ${filename}…`;
+
     try {
-      const flow = await callGemini([
+      const raw = await callGemini([
         { image_url: { url: entry.url } },
         { text: 'Analyse this concept deck and return its flow as JSON.' }
       ], FLOW_SYSTEM, 600);
-      entry.flow = parseJSON(flow);
+
+      // Robust JSON extraction — pull first { ... } block from response
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error(`No JSON found in response: ${raw.slice(0, 100)}`);
+
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      // Find and update the entry in the main repository array by URL reference
+      const repoEntry = repository.find(r => r.url === entry.url);
+      if (repoEntry) {
+        repoEntry.flow = parsed;
+        successCount++;
+      }
     } catch(e) {
-      console.warn('Failed to index', entry.url, e.message);
+      failCount++;
+      console.warn(`Failed to index ${filename}:`, e.message);
+      progressText.textContent = `⚠ Skipped ${filename}: ${e.message.slice(0, 60)}`;
+      await new Promise(r => setTimeout(r, 1000));
     }
+
     updateIndexStatus();
-    if (i < unindexed.length - 1) await new Promise(r => setTimeout(r, 600));
+    if (i < unindexed.length - 1) await new Promise(r => setTimeout(r, 700));
   }
 
   btn.disabled = false;
   progressText.classList.remove('visible');
+  progressText.textContent = '';
   updateIndexStatus();
+
+  const summary = `Indexing complete: ${successCount} succeeded, ${failCount} failed.${failCount > 0 ? ' Check browser console for details.' : ''}`;
+  document.getElementById('indexStatus').innerHTML += `<br><span style="font-size:12px;color:var(--text-tertiary);">${summary}</span>`;
 }
 
 // ── Download repository.json ──────────────────────────
@@ -503,8 +537,7 @@ document.getElementById('deckInput').addEventListener('change', e => {
     document.getElementById('deckZone').classList.add('has-file');
     document.getElementById('deckLabel').textContent = file.name;
     document.getElementById('deckChips').innerHTML = `<span class="file-chip">${file.name}</span>`;
-    const indexed = repository.filter(r => r.flow).length;
-    document.getElementById('matchBtn').disabled = indexed === 0;
+    checkMatchReady();
     hideErr(document.getElementById('matchError'));
   };
   reader.readAsDataURL(file);
